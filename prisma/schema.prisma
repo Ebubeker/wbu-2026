@@ -40,6 +40,24 @@ enum CardType {
   RED
 }
 
+enum KitType {
+  HOME
+  AWAY
+}
+
+enum KitPattern {
+  SOLID
+  STRIPES
+  CHECKERED
+  GRADIENT
+}
+
+enum VoteChoice {
+  HOME
+  DRAW
+  AWAY
+}
+
 model User {
   id           String   @id @default(uuid())
   username     String   @unique
@@ -75,9 +93,12 @@ model Team {
   homeMatches Match[]  @relation("HomeTeam")
   awayMatches Match[]  @relation("AwayTeam")
   goals       Goal[]
-  cards       Card[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  cards            Card[]
+  kits             Kit[]
+  lineups          Lineup[]
+  defaultFormation String   @default("1-2-2-1")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@index([groupId])
 }
@@ -90,10 +111,11 @@ model Player {
   photo     String?
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   teamId    String
-  goals     Goal[]
-  cards     Card[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  goals         Goal[]
+  cards         Card[]
+  lineupEntries LineupPlayer[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@index([teamId])
 }
@@ -127,6 +149,8 @@ model Match {
   matchMinute     Int         @default(0)
   goals           Goal[]
   cards           Card[]
+  lineups         Lineup[]
+  votes           MatchVote[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -164,5 +188,63 @@ model Card {
   minute    Int
   createdAt DateTime @default(now())
 
+  @@index([matchId])
+}
+
+model Kit {
+  id             String     @id @default(uuid())
+  team           Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId         String
+  type           KitType
+  primaryColor   String
+  secondaryColor String
+  pattern        KitPattern @default(SOLID)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@unique([teamId, type])
+  @@index([teamId])
+}
+
+model Lineup {
+  id        String         @id @default(uuid())
+  match     Match          @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId   String
+  team      Team           @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId    String
+  formation String
+  players   LineupPlayer[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([matchId, teamId])
+  @@index([matchId])
+  @@index([teamId])
+}
+
+model LineupPlayer {
+  id           String   @id @default(uuid())
+  lineup       Lineup   @relation(fields: [lineupId], references: [id], onDelete: Cascade)
+  lineupId     String
+  player       Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId     String
+  positionSlot Int
+  createdAt    DateTime @default(now())
+
+  @@unique([lineupId, positionSlot])
+  @@unique([lineupId, playerId])
+  @@index([lineupId])
+}
+
+model MatchVote {
+  id                String     @id @default(uuid())
+  match             Match      @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId           String
+  vote              VoteChoice
+  ipAddress         String
+  deviceFingerprint String
+  createdAt         DateTime   @default(now())
+
+  @@unique([matchId, deviceFingerprint])
   @@index([matchId])
 }
