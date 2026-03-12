@@ -65,6 +65,29 @@ export const captainSchema = z.object({
   teamId: z.string().uuid(),
 })
 
+export const kitSchema = z.object({
+  teamId: z.string().uuid(),
+  type: z.enum(['HOME', 'AWAY']),
+  primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Must be a valid hex color'),
+  secondaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Must be a valid hex color'),
+  pattern: z.enum(['SOLID', 'STRIPES', 'CHECKERED', 'GRADIENT']),
+})
+
+export const lineupSchema = z.object({
+  matchId: z.string().uuid(),
+  teamId: z.string().uuid(),
+  formation: z.enum(['1-2-2-1', '1-1-3-1', '1-3-1-1', '1-2-1-2']),
+  players: z.array(z.object({
+    playerId: z.string().uuid(),
+    positionSlot: z.number().int().min(0).max(5),
+  })).length(6),
+})
+
+export const voteSchema = z.object({
+  vote: z.enum(['HOME', 'DRAW', 'AWAY']),
+  fingerprint: z.string().min(1),
+})
+
 // Inferred types for convenience
 export type LoginInput = z.infer<typeof loginSchema>
 export type TeamInput = z.infer<typeof teamSchema>
@@ -75,3 +98,6 @@ export type CardInput = z.infer<typeof cardSchema>
 export type CompetitionInput = z.infer<typeof competitionSchema>
 export type GroupInput = z.infer<typeof groupSchema>
 export type CaptainInput = z.infer<typeof captainSchema>
+export type KitInput = z.infer<typeof kitSchema>
+export type LineupInput = z.infer<typeof lineupSchema>
+export type VoteInput = z.infer<typeof voteSchema>
