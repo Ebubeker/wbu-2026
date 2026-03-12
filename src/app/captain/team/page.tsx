@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ImageUpload } from "@/components/common/ImageUpload"
 import { PageHeader } from "@/components/common/PageHeader"
 import { LoadingSpinner } from "@/components/common/LoadingSpinner"
+import { FORMATIONS, FORMATION_LABELS } from "@/lib/formations"
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
@@ -128,6 +130,37 @@ export default function CaptainTeamPage() {
           >
             {saving ? "Saving..." : "Save Changes"}
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Default Formation */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-base">Default Formation</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Label htmlFor="defaultFormation">Used when no lineup is set before a match</Label>
+          <Select
+            value={team.defaultFormation ?? '1-2-2-1'}
+            onValueChange={async (value) => {
+              await fetch(`/api/teams/${team.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ defaultFormation: value }),
+              })
+              mutate()
+              toast.success('Default formation updated')
+            }}
+          >
+            <SelectTrigger id="defaultFormation" className="mt-2">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {FORMATIONS.map((f) => (
+                <SelectItem key={f} value={f}>{FORMATION_LABELS[f]}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </CardContent>
       </Card>
     </div>

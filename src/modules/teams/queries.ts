@@ -38,6 +38,9 @@ export async function getTeamWithPlayersAndMatches(id: string) {
       captain: {
         select: { id: true, username: true },
       },
+      kits: {
+        select: { id: true, type: true, primaryColor: true, secondaryColor: true, pattern: true },
+      },
       homeMatches: {
         include: {
           awayTeam: { select: { id: true, name: true, shortName: true, logo: true } },

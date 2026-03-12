@@ -9,6 +9,8 @@ import { formatDate, formatTime, formatMatchMinute } from '@/lib/utils'
 import { Calendar as CalendarIcon, Clock, MapPin, Radio } from 'lucide-react'
 import { SSE_RETRY_INTERVAL } from '@/lib/constants'
 import { cn } from '@/lib/utils'
+import { LineupDisplay } from '@/modules/lineups/components/LineupDisplay'
+import { VotePanel } from '@/modules/voting/components/VotePanel'
 import type { MatchWithEvents } from '../types'
 
 interface MatchDetailProps {
@@ -322,6 +324,35 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Lineup visualization */}
+      {(() => {
+        const homeLineup = match.lineups?.find((l) => l.teamId === match.homeTeam?.id) ?? null
+        const awayLineup = match.lineups?.find((l) => l.teamId === match.awayTeam?.id) ?? null
+        const homeKit = match.homeTeam?.kits?.[0] ?? null
+        const awayKit = match.awayTeam?.kits?.[0] ?? null
+
+        return (
+          <LineupDisplay
+            homeLineup={homeLineup}
+            awayLineup={awayLineup}
+            homeKit={homeKit}
+            awayKit={awayKit}
+            homeTeamName={match.homeTeam?.name ?? match.homePlaceholder ?? undefined}
+            awayTeamName={match.awayTeam?.name ?? match.awayPlaceholder ?? undefined}
+          />
+        )
+      })()}
+
+      {/* Fan voting */}
+      {match.homeTeam && match.awayTeam && (
+        <VotePanel
+          matchId={match.id}
+          homeTeamName={match.homeTeam.name}
+          awayTeamName={match.awayTeam.name}
+          isFinished={match.status === 'FULL_TIME'}
+        />
       )}
 
       {(match.homeTeam || match.awayTeam) && (

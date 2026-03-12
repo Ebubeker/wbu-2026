@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/db"
 import { getSession } from "@/lib/auth"
 import { teamSchema } from "@/lib/validations"
+import { FORMATIONS } from "@/lib/formations"
 
 export async function GET(
   request: NextRequest,
@@ -49,13 +50,22 @@ export async function PUT(
     const body = await request.json()
 
     if (isCaptain && !isAdmin) {
-      // Captains can only update name, shortName, description, logo
-      const allowed = {
+      // Captains can only update name, shortName, description, logo, defaultFormation
+      const allowed: Record<string, unknown> = {
         name: body.name,
         shortName: body.shortName,
         description: body.description,
         logo: body.logo,
       }
+
+      // Validate and add defaultFormation if provided
+      if (body.defaultFormation !== undefined) {
+        if (!(FORMATIONS as readonly string[]).includes(body.defaultFormation)) {
+          return NextResponse.json({ error: 'Invalid formation' }, { status: 400 })
+        }
+        allowed.defaultFormation = body.defaultFormation
+      }
+
       // Remove undefined fields
       const updateData = Object.fromEntries(
         Object.entries(allowed).filter(([_, v]) => v !== undefined)

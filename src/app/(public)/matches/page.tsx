@@ -28,6 +28,8 @@ export default async function MatchesPage() {
       id: match.id,
       homeTeam: match.homeTeam!,
       awayTeam: match.awayTeam!,
+      homePlaceholder: match.homePlaceholder,
+      awayPlaceholder: match.awayPlaceholder,
       homeScore: match.homeScore,
       awayScore: match.awayScore,
       status: match.status,

@@ -1,9 +1,10 @@
 import Image from 'next/image'
-import { Shield, Trophy, Users } from 'lucide-react'
+import { Shield, Trophy, Users, Shirt } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { PlayerCard } from '@/modules/players/components/PlayerCard'
 import { cn } from '@/lib/utils'
+import { KitPreview } from '@/modules/kits/components/KitPreview'
 import type { TeamWithPlayers } from '../types'
 import type { PlayerData } from '@/modules/players/types'
 
@@ -113,6 +114,25 @@ export function TeamDetail({ team, matches }: TeamDetailProps) {
                 <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
                   {team.description}
                 </p>
+              )}
+
+              {/* Kit display */}
+              {team.kits && team.kits.length > 0 && (
+                <div className="flex gap-4 mt-4">
+                  {team.kits.map((kit) => (
+                    <div key={kit.id} className="text-center">
+                      <KitPreview
+                        primaryColor={kit.primaryColor}
+                        secondaryColor={kit.secondaryColor}
+                        pattern={kit.pattern as 'SOLID' | 'STRIPES' | 'CHECKERED' | 'GRADIENT'}
+                        size={80}
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {kit.type === 'HOME' ? 'Home' : 'Away'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>

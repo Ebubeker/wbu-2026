@@ -18,6 +18,8 @@ interface MatchDetailData {
   id: string
   homeTeam: { id: string; name: string; shortName: string; logo: string | null }
   awayTeam: { id: string; name: string; shortName: string; logo: string | null }
+  homePlaceholder: string | null
+  awayPlaceholder: string | null
   homeTeamId: string
   awayTeamId: string
   homeScore: number

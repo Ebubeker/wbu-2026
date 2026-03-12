@@ -36,6 +36,7 @@ export interface MatchWithEvents extends MatchData {
     shortName: string
     logo: string | null
     players: Array<{ id: string; name: string; number: number; position: string }>
+    kits: Array<{ primaryColor: string; secondaryColor: string; pattern: string }>
   } | null
   awayTeam: {
     id: string
@@ -43,7 +44,20 @@ export interface MatchWithEvents extends MatchData {
     shortName: string
     logo: string | null
     players: Array<{ id: string; name: string; number: number; position: string }>
+    kits: Array<{ primaryColor: string; secondaryColor: string; pattern: string }>
   } | null
+  lineups: Array<{
+    id: string
+    matchId: string
+    teamId: string
+    formation: string
+    players: Array<{
+      id: string
+      playerId: string
+      positionSlot: number
+      player: { id: string; name: string; number: number; position: string }
+    }>
+  }>
 }
 
 export interface MatchFormValues {

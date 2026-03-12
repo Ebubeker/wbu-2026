@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { PageHeader } from "@/components/common/PageHeader"
 import { format } from "date-fns"
-import { Users, Camera, Calendar, Trophy, TrendingUp } from "lucide-react"
+import { Users, Camera, Calendar, Trophy, TrendingUp, Shirt } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
 
@@ -219,6 +219,36 @@ export default async function CaptainDashboard() {
             </div>
             <Button asChild>
               <Link href="/captain/players">Manage</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="flex items-center gap-4 py-6">
+            <div className="rounded-full bg-primary/10 p-3">
+              <Shirt className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold">Team Kits</h3>
+              <p className="text-sm text-muted-foreground">Design home and away kits</p>
+            </div>
+            <Button asChild>
+              <Link href="/captain/kits">Design</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="flex items-center gap-4 py-6">
+            <div className="rounded-full bg-primary/10 p-3">
+              <Calendar className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold">Match Center</h3>
+              <p className="text-sm text-muted-foreground">View matches and set lineups</p>
+            </div>
+            <Button asChild>
+              <Link href="/captain/matches">View</Link>
             </Button>
           </CardContent>
         </Card>

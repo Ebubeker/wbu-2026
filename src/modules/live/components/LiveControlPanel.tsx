@@ -150,8 +150,8 @@ export function LiveControlPanel({ match: initialMatch }: LiveControlPanelProps)
       <Card>
         <CardContent className="p-4">
           <LiveScoreboard
-            homeTeam={currentMatch.homeTeam}
-            awayTeam={currentMatch.awayTeam}
+            homeTeam={currentMatch.homeTeam!}
+            awayTeam={currentMatch.awayTeam!}
             homeScore={currentMatch.homeScore}
             awayScore={currentMatch.awayScore}
             matchMinute={currentMatch.matchMinute}
@@ -246,8 +246,8 @@ export function LiveControlPanel({ match: initialMatch }: LiveControlPanelProps)
               <TabsContent value="goal" className="mt-4">
                 <GoalForm
                   matchId={currentMatch.id}
-                  homeTeam={currentMatch.homeTeam}
-                  awayTeam={currentMatch.awayTeam}
+                  homeTeam={currentMatch.homeTeam!}
+                  awayTeam={currentMatch.awayTeam!}
                   currentMinute={currentMatch.matchMinute}
                   onSubmit={handleAddGoal}
                 />
@@ -255,8 +255,8 @@ export function LiveControlPanel({ match: initialMatch }: LiveControlPanelProps)
               <TabsContent value="card" className="mt-4">
                 <CardForm
                   matchId={currentMatch.id}
-                  homeTeam={currentMatch.homeTeam}
-                  awayTeam={currentMatch.awayTeam}
+                  homeTeam={currentMatch.homeTeam!}
+                  awayTeam={currentMatch.awayTeam!}
                   currentMinute={currentMatch.matchMinute}
                   onSubmit={handleAddCard}
                 />

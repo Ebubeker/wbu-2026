@@ -10,6 +10,8 @@ import {
   LogOut,
   Menu,
   User,
+  Shirt,
+  Calendar,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -26,6 +28,8 @@ const navItems = [
   { href: "/captain", label: "Dashboard", icon: LayoutDashboard },
   { href: "/captain/team", label: "My Team", icon: Users },
   { href: "/captain/players", label: "Player Photos", icon: Camera },
+  { href: "/captain/kits", label: "Kits", icon: Shirt },
+  { href: "/captain/matches", label: "Matches", icon: Calendar },
 ]
 
 function isActive(pathname: string, href: string) {

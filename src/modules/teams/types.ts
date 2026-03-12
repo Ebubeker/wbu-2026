@@ -20,6 +20,14 @@ export interface TeamWithPlayers extends TeamData {
   }>
   captain?: { id: string; username: string } | null
   _count?: { players: number }
+  kits?: Array<{
+    id: string
+    type: 'HOME' | 'AWAY'
+    primaryColor: string
+    secondaryColor: string
+    pattern: string
+  }>
+  defaultFormation?: string
 }
 
 export interface TeamFormValues {

@@ -5,6 +5,7 @@ import { MatchStatus, CardType } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { goalSchema, cardSchema } from '@/lib/validations'
 import { broadcastToMatch } from './sse'
+import { autoFillLineup } from '@/modules/lineups/actions'
 
 function revalidateMatchPaths() {
   revalidatePath('/matches')
@@ -53,6 +54,20 @@ export async function updateMatchStatus(
   status: string,
   matchMinute: number
 ) {
+  // Auto-fill lineups when match starts
+  if (status === 'FIRST_HALF') {
+    const matchData = await prisma.match.findUnique({
+      where: { id: matchId },
+      select: { homeTeamId: true, awayTeamId: true },
+    })
+    if (matchData?.homeTeamId) {
+      await autoFillLineup(matchId, matchData.homeTeamId)
+    }
+    if (matchData?.awayTeamId) {
+      await autoFillLineup(matchId, matchData.awayTeamId)
+    }
+  }
+
   const match = await prisma.match.update({
     where: { id: matchId },
     data: { status: status as MatchStatus, matchMinute },

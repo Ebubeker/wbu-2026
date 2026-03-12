@@ -54,8 +54,18 @@ export async function getMatchById(id: string): Promise<MatchWithEvents | null> 
   const match = await prisma.match.findUnique({
     where: { id },
     include: {
-      homeTeam: { select: teamWithPlayersSelect },
-      awayTeam: { select: teamWithPlayersSelect },
+      homeTeam: {
+        select: {
+          ...teamWithPlayersSelect,
+          kits: { where: { type: 'HOME' }, select: { primaryColor: true, secondaryColor: true, pattern: true } },
+        },
+      },
+      awayTeam: {
+        select: {
+          ...teamWithPlayersSelect,
+          kits: { where: { type: 'AWAY' }, select: { primaryColor: true, secondaryColor: true, pattern: true } },
+        },
+      },
       group: { select: { id: true, name: true } },
       goals: {
         include: {
@@ -70,6 +80,16 @@ export async function getMatchById(id: string): Promise<MatchWithEvents | null> 
           team: { select: { id: true, name: true } },
         },
         orderBy: { minute: 'asc' },
+      },
+      lineups: {
+        include: {
+          players: {
+            include: {
+              player: { select: { id: true, name: true, number: true, position: true } },
+            },
+            orderBy: { positionSlot: 'asc' as const },
+          },
+        },
       },
     },
   })
