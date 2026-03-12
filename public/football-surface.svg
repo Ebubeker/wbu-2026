@@ -1,0 +1,25 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="900" fill="#060907"/>
+  <rect width="1200" height="900" fill="url(#fieldGlow)"/>
+  <ellipse cx="620" cy="680" rx="540" ry="280" fill="url(#spotlight)" opacity="0.75"/>
+  <path d="M-40 620C210 560 398 528 627 528C856 528 1048 560 1240 620" stroke="#9CB35A" stroke-opacity="0.18" stroke-width="4"/>
+  <path d="M170 130C510 260 826 260 1110 136" stroke="#D8E68A" stroke-opacity="0.12" stroke-width="3"/>
+  <path d="M410 86C636 216 884 214 1088 126" stroke="#D8E68A" stroke-opacity="0.08" stroke-width="2"/>
+  <circle cx="362" cy="342" r="3" fill="#D8E68A" fill-opacity="0.35"/>
+  <circle cx="868" cy="304" r="3" fill="#D8E68A" fill-opacity="0.25"/>
+  <circle cx="1012" cy="540" r="3" fill="#D8E68A" fill-opacity="0.25"/>
+  <rect x="118" y="226" width="964" height="474" rx="28" stroke="#D8E68A" stroke-opacity="0.08" stroke-width="2"/>
+  <rect x="352" y="318" width="496" height="290" rx="145" stroke="#D8E68A" stroke-opacity="0.06" stroke-width="2"/>
+  <defs>
+    <radialGradient id="fieldGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(696 724) rotate(-111.12) scale(696.655 877.406)">
+      <stop stop-color="#2E401B"/>
+      <stop offset="0.45" stop-color="#162111"/>
+      <stop offset="1" stop-color="#060907"/>
+    </radialGradient>
+    <radialGradient id="spotlight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(600 620) rotate(90) scale(260 500)">
+      <stop stop-color="#B7CB67"/>
+      <stop offset="0.45" stop-color="#5F7432"/>
+      <stop offset="1" stop-color="#182111" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

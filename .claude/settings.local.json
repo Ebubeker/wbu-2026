@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --no-turbopack --import-alias \"@/*\" 2>&1 | tail -5)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npx create-next-app@latest wbu2026-temp --typescript --tailwind --eslint --app --src-dir --no-turbopack --import-alias \"@/*\" 2>&1 | tail -10)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npm install next@latest react@latest react-dom@latest typescript @types/react @types/react-dom @types/node 2>&1 | tail -5)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npm install tailwindcss @tailwindcss/postcss postcss autoprefixer prisma @prisma/client bcryptjs jsonwebtoken zod swr sonner date-fns uuid 2>&1 | tail -5)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npm install -D @types/bcryptjs @types/jsonwebtoken @types/uuid tsx tailwind-merge clsx class-variance-authority lucide-react @radix-ui/react-slot @radix-ui/react-dialog @radix-ui/react-alert-dialog @radix-ui/react-dropdown-menu @radix-ui/react-select @radix-ui/react-tabs @radix-ui/react-label @radix-ui/react-switch @radix-ui/react-tooltip @radix-ui/react-popover @radix-ui/react-separator @radix-ui/react-scroll-area @radix-ui/react-avatar @radix-ui/react-toggle @radix-ui/react-toggle-group 2>&1 | tail -5)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && mkdir -p src/app/login src/app/\\\\\\(public\\\\\\)/matches/\\\\[id\\\\] src/app/\\\\\\(public\\\\\\)/standings src/app/\\\\\\(public\\\\\\)/bracket src/app/\\\\\\(public\\\\\\)/teams/\\\\[id\\\\] src/app/captain/team src/app/captain/players src/app/admin/competition src/app/admin/teams/\\\\[id\\\\] src/app/admin/groups src/app/admin/matches/\\\\[id\\\\]/live src/app/admin/bracket src/app/admin/settings src/app/api/auth/login src/app/api/auth/logout src/app/api/auth/me src/app/api/competition src/app/api/teams/\\\\[id\\\\] src/app/api/players/\\\\[id\\\\] src/app/api/groups/\\\\[id\\\\]/generate-matches src/app/api/matches/\\\\[id\\\\]/status src/app/api/matches/\\\\[id\\\\]/live-stream src/app/api/goals/\\\\[id\\\\] src/app/api/cards/\\\\[id\\\\] src/app/api/standings src/app/api/bracket/generate src/app/api/uploads)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && mkdir -p src/modules/auth/components src/modules/competition/components src/modules/teams/components src/modules/players/components src/modules/groups/components src/modules/matches/components src/modules/live/components src/modules/standings/components src/modules/bracket/components src/components/ui src/components/layout src/components/common src/lib prisma public/uploads/teams public/uploads/players)",
+      "Bash(find \"C:/Users/Zbook/OneDrive/Desktop/WBU2026/src\" -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.css\" 2>/dev/null | wc -l)",
+      "Bash(find \"C:/Users/Zbook/OneDrive/Desktop/WBU2026/prisma\" -name \"*.ts\" -o -name \"*.prisma\" 2>/dev/null | wc -l)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npx prisma generate 2>&1)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npm install prisma@5 @prisma/client@5 2>&1 | tail -5)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npx next build 2>&1 | head -100)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npx next build 2>&1 | head -80)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npx next build 2>&1 | grep -E \"^\\(./|Failed|Type error\\)\" | head -30)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npx next build 2>&1 | grep -E \"\\(Type error|^\\\\.\\\\/\\)\" | head -10)",
+      "Bash(cd \"C:/Users/Zbook/OneDrive/Desktop/WBU2026\" && npx next build 2>&1 | tail -30)",
+      "Bash(ls -la \"C:\\\\Users\\\\Zbook\\\\OneDrive\\\\Desktop\\\\WBU2026\\\\src\\\\app\\\\\\(public\\)\")",
+      "Bash(find \"C:\\\\Users\\\\Zbook\\\\OneDrive\\\\Desktop\\\\WBU2026\\\\src\\\\app\\\\\\(public\\)\" -type f -name \"page.tsx\" -o -name \"layout.tsx\")",
+      "Bash(cd \"C:\\\\Users\\\\Zbook\\\\OneDrive\\\\Desktop\\\\WBU2026\" && npx next build 2>&1 | tail -30)",
+      "Bash(cd \"C:\\\\Users\\\\Zbook\\\\OneDrive\\\\Desktop\\\\WBU2026\" && npx next build 2>&1 | tail -15)",
+      "Bash(cd \"C:\\\\Users\\\\Zbook\\\\OneDrive\\\\Desktop\\\\WBU2026\" && npx prisma db execute --stdin <<'SQL'\nDELETE FROM \"Card\";\nDELETE FROM \"Goal\";\nDELETE FROM \"Match\";\nDELETE FROM \"Player\";\nUPDATE \"User\" SET \"teamId\" = NULL WHERE \"role\" = 'CAPTAIN';\nDELETE FROM \"Team\";\nDELETE FROM \"Group\";\nDELETE FROM \"User\" WHERE \"role\" = 'CAPTAIN';\nSQL)",
+      "Bash(cd \"C:\\\\Users\\\\Zbook\\\\OneDrive\\\\Desktop\\\\WBU2026\" && npx next build 2>&1 | tail -20)",
+      "Bash(find \"C:\\\\Users\\\\Zbook\\\\OneDrive\\\\Desktop\\\\WBU2026/src\" -name \"constants*\" -o -name \"validations*\" -o -name \"schema*\" | grep -E \"\\\\.\\(ts|tsx\\)$\")",
+      "Bash(cd \"C:\\\\Users\\\\Zbook\\\\OneDrive\\\\Desktop\\\\WBU2026\" && npx prisma db push --accept-data-loss 2>&1)",
+      "Bash(cd \"C:\\\\Users\\\\Zbook\\\\OneDrive\\\\Desktop\\\\WBU2026\" && npx prisma generate 2>&1)",
+      "Bash(tasklist | grep -i node | head -5)",
+      "Bash(bash \"C:\\\\Users\\\\Zbook\\\\.claude\\\\plugins\\\\cache\\\\claude-plugins-official\\\\superpowers\\\\5.0.1\\\\skills\\\\brainstorming\\\\scripts\\\\start-server.sh\" --project-dir \"C:\\\\Users\\\\Zbook\\\\OneDrive\\\\Desktop\\\\WBU2026\")",
+      "Bash(find \"C:\\\\Users\\\\Zbook\\\\OneDrive\\\\Desktop\\\\WBU2026/src/modules\" -type f | grep -E \"\\\\.\\(ts|tsx\\)$\" | sort)"
+    ]
+  }
+}

@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CAPTAIN
+}
+
+enum Position {
+  GK
+  DEF
+  MID
+  FWD
+}
+
+enum MatchStage {
+  GROUP
+  QUARTERFINAL
+  SEMIFINAL
+  THIRD_PLACE
+  FINAL
+}
+
+enum MatchStatus {
+  SCHEDULED
+  FIRST_HALF
+  HALF_TIME
+  SECOND_HALF
+  FULL_TIME
+}
+
+enum CardType {
+  YELLOW
+  RED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  role         Role
+  teamId       String?  @unique
+  team         Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Competition {
+  id          String   @id @default(uuid())
+  name        String   @default("WBU 2026 Championship")
+  season      String   @default("2026")
+  description String?
+  logoUrl     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Team {
+  id          String   @id @default(uuid())
+  name        String
+  shortName   String
+  logo        String?
+  description String?
+  group       Group?   @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  groupId     String?
+  captain     User?
+  players     Player[]
+  homeMatches Match[]  @relation("HomeTeam")
+  awayMatches Match[]  @relation("AwayTeam")
+  goals       Goal[]
+  cards       Card[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([groupId])
+}
+
+model Player {
+  id        String   @id @default(uuid())
+  name      String
+  number    Int
+  position  Position
+  photo     String?
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId    String
+  goals     Goal[]
+  cards     Card[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamId])
+}
+
+model Group {
+  id        String   @id @default(uuid())
+  name      String
+  order     Int      @default(0)
+  teams     Team[]
+  matches   Match[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Match {
+  id              String      @id @default(uuid())
+  homeTeam        Team?       @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  homeTeamId      String?
+  awayTeam        Team?       @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  awayTeamId      String?
+  homePlaceholder String?
+  awayPlaceholder String?
+  group           Group?      @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  groupId         String?
+  stage           MatchStage
+  status          MatchStatus @default(SCHEDULED)
+  homeScore       Int         @default(0)
+  awayScore       Int         @default(0)
+  matchDate       DateTime
+  venue           String?
+  matchMinute     Int         @default(0)
+  goals           Goal[]
+  cards           Card[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([groupId])
+  @@index([status])
+  @@index([stage])
+  @@index([homeTeamId])
+  @@index([awayTeamId])
+}
+
+model Goal {
+  id        String   @id @default(uuid())
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId   String
+  team      Team     @relation(fields: [teamId], references: [id])
+  teamId    String
+  player    Player   @relation(fields: [playerId], references: [id])
+  playerId  String
+  minute    Int
+  isOwnGoal Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([matchId])
+}
+
+model Card {
+  id        String   @id @default(uuid())
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId   String
+  team      Team     @relation(fields: [teamId], references: [id])
+  teamId    String
+  player    Player   @relation(fields: [playerId], references: [id])
+  playerId  String
+  type      CardType
+  minute    Int
+  createdAt DateTime @default(now())
+
+  @@index([matchId])
+}

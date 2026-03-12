@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Roboto", "Segoe UI", sans-serif;
+  --font-display: "Inter", "Roboto", "Segoe UI", sans-serif;
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(210 11% 15%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(210 11% 15%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(210 11% 15%);
+  --color-primary: hsl(170 52% 47%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-secondary: hsl(170 30% 96%);
+  --color-secondary-foreground: hsl(210 11% 15%);
+  --color-muted: hsl(210 11% 96%);
+  --color-muted-foreground: hsl(210 8% 46%);
+  --color-accent: hsl(170 30% 93%);
+  --color-accent-foreground: hsl(210 11% 15%);
+  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive-foreground: hsl(0 0% 100%);
+  --color-border: hsl(210 13% 91%);
+  --color-input: hsl(210 13% 91%);
+  --color-ring: hsl(170 52% 47%);
+  --radius: 0.75rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+body::selection {
+  background-color: hsl(170 52% 47% / 0.15);
+  color: var(--color-foreground);
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: hsl(170 52% 47% / 0.25);
+  background-clip: padding-box;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.animate-pulse-live {
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
