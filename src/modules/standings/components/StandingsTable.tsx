@@ -2,14 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -20,82 +12,6 @@ interface StandingsTableProps {
   groupName: string
   standings: StandingsRow[]
   qualifyCount?: number
-}
-
-function TeamIdentity({ row }: { row: StandingsRow }) {
-  return (
-    <Link
-      href={`/teams/${row.team.id}`}
-      className="flex min-w-0 items-center gap-3 hover:underline"
-    >
-      {row.team.logo ? (
-        <img
-          src={row.team.logo}
-          alt={row.team.name}
-          className="h-10 w-10 rounded-[12px] border border-white/10 bg-background object-cover p-2"
-        />
-      ) : (
-        <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-white/10 bg-background text-xs font-semibold text-foreground">
-          {row.team.shortName}
-        </div>
-      )}
-      <div className="min-w-0">
-        <p className="truncate font-semibold text-foreground">{row.team.name}</p>
-        <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
-          {row.team.shortName}
-        </p>
-      </div>
-    </Link>
-  )
-}
-
-function MobileRow({ row, isQualifying, expanded }: { row: StandingsRow; isQualifying: boolean; expanded: boolean }) {
-  return (
-    <tr className="border-b border-white/5">
-      <td className="py-2.5 pl-4 pr-1">
-        <span className={cn(
-          'inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold',
-          isQualifying
-            ? 'bg-emerald-500 text-white'
-            : 'bg-white/5 text-muted-foreground'
-        )}>
-          {row.position}
-        </span>
-      </td>
-      <td className="py-2.5 px-1">
-        <Link href={`/teams/${row.team.id}`} className="flex items-center gap-2.5 hover:underline">
-          {row.team.logo ? (
-            <img src={row.team.logo} alt={row.team.name} className="h-6 w-6 shrink-0 rounded-full object-cover" />
-          ) : (
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[9px] font-bold text-foreground">
-              {row.team.shortName.slice(0, 2)}
-            </div>
-          )}
-          <span className="truncate text-[13px] font-medium text-foreground">{row.team.name}</span>
-        </Link>
-      </td>
-      <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.played}</td>
-      {expanded && (
-        <>
-          <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.won}</td>
-          <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.drawn}</td>
-          <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.lost}</td>
-        </>
-      )}
-      <td className={cn(
-        'py-2.5 px-1 text-center text-[13px] tabular-nums font-medium',
-        row.goalDifference > 0 ? 'text-emerald-400' : row.goalDifference < 0 ? 'text-rose-400' : 'text-muted-foreground'
-      )}>
-        {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
-      </td>
-      {expanded && (
-        <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">
-          {row.goalsFor}:{row.goalsAgainst}
-        </td>
-      )}
-      <td className="py-2.5 pl-1 pr-4 text-center text-[14px] tabular-nums font-bold text-foreground">{row.points}</td>
-    </tr>
-  )
 }
 
 export function StandingsTable({
@@ -120,6 +36,7 @@ export function StandingsTable({
   return (
     <Card className="overflow-hidden">
       <CardContent className="p-0">
+        {/* Header */}
         <div className="flex flex-col gap-3 border-b border-white/10 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-primary/75">
@@ -133,128 +50,106 @@ export function StandingsTable({
               <h3 className="mt-2 text-2xl font-semibold text-foreground">{groupName}</h3>
             )}
           </div>
-          <Badge variant="secondary">Top {qualifyCount} advance</Badge>
-        </div>
-
-        {/* Mobile view */}
-        <div className="md:hidden">
-          {/* Toggle */}
-          <div className="flex items-center justify-end gap-1 px-4 pt-3">
-            <button
-              onClick={() => setExpanded(false)}
-              className={cn(
-                'rounded-l-lg px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors',
-                !expanded
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-white/5 text-muted-foreground hover:text-foreground'
-              )}
-            >
-              Short
-            </button>
-            <button
-              onClick={() => setExpanded(true)}
-              className={cn(
-                'rounded-r-lg px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors',
-                expanded
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-white/5 text-muted-foreground hover:text-foreground'
-              )}
-            >
-              Full
-            </button>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className={cn('w-full', expanded && 'min-w-[480px]')}>
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="py-3 pl-4 pr-1 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">#</th>
-                  <th className="py-3 px-1 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Team</th>
-                  <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">P</th>
-                  {expanded && (
-                    <>
-                      <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">W</th>
-                      <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">D</th>
-                      <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">L</th>
-                    </>
-                  )}
-                  <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-10">DIFF</th>
-                  {expanded && (
-                    <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-14">GLS</th>
-                  )}
-                  <th className="py-3 pl-1 pr-4 text-center text-[11px] font-bold uppercase tracking-wider text-foreground w-10">PTS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {standings.map((row) => (
-                  <MobileRow
-                    key={row.team.id}
-                    row={row}
-                    isQualifying={row.position <= qualifyCount}
-                    expanded={expanded}
-                  />
-                ))}
-              </tbody>
-            </table>
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary">Top {qualifyCount} advance</Badge>
+            {/* Short / Full toggle */}
+            <div className="flex">
+              <button
+                onClick={() => setExpanded(false)}
+                className={cn(
+                  'rounded-l-lg px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors',
+                  !expanded
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-white/5 text-muted-foreground hover:text-foreground'
+                )}
+              >
+                Short
+              </button>
+              <button
+                onClick={() => setExpanded(true)}
+                className={cn(
+                  'rounded-r-lg px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors',
+                  expanded
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-white/5 text-muted-foreground hover:text-foreground'
+                )}
+              >
+                Full
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Desktop view */}
-        <div className="hidden p-4 md:block">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12 text-center">#</TableHead>
-                <TableHead>Team</TableHead>
-                <TableHead className="w-10 text-center">P</TableHead>
-                <TableHead className="w-10 text-center">W</TableHead>
-                <TableHead className="w-10 text-center">D</TableHead>
-                <TableHead className="w-10 text-center">L</TableHead>
-                <TableHead className="w-10 text-center">GF</TableHead>
-                <TableHead className="w-10 text-center">GA</TableHead>
-                <TableHead className="w-12 text-center">GD</TableHead>
-                <TableHead className="w-12 text-center">Pts</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/10">
+                <th className="py-3 pl-4 pr-1 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-10">#</th>
+                <th className="py-3 px-2 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Team</th>
+                <th className="py-3 px-2 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-10">P</th>
+                {expanded && (
+                  <>
+                    <th className="py-3 px-2 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-10">W</th>
+                    <th className="py-3 px-2 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-10">D</th>
+                    <th className="py-3 px-2 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-10">L</th>
+                    <th className="py-3 px-2 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-10">GF</th>
+                    <th className="py-3 px-2 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-10">GA</th>
+                  </>
+                )}
+                <th className="py-3 px-2 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-12">GD</th>
+                <th className="py-3 pl-2 pr-4 text-center text-[11px] font-bold uppercase tracking-wider text-foreground w-12">PTS</th>
+              </tr>
+            </thead>
+            <tbody>
               {standings.map((row) => {
                 const isQualifying = row.position <= qualifyCount
-
                 return (
-                  <TableRow
-                    key={row.team.id}
-                    className={cn(isQualifying && 'bg-emerald-500/10')}
-                  >
-                    <TableCell className="text-center font-semibold">
-                      <span
-                        className={cn(
-                          'inline-flex h-9 w-9 items-center justify-center rounded-[12px] border border-white/10 bg-background',
-                          isQualifying && 'border-emerald-300/30 bg-emerald-400/15 text-emerald-50'
-                        )}
-                      >
+                  <tr key={row.team.id} className={cn('border-b border-white/5', isQualifying && 'bg-emerald-500/5')}>
+                    <td className="py-3 pl-4 pr-1">
+                      <span className={cn(
+                        'inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold',
+                        isQualifying
+                          ? 'bg-emerald-500 text-white'
+                          : 'bg-white/5 text-muted-foreground'
+                      )}>
                         {row.position}
                       </span>
-                    </TableCell>
-                    <TableCell>
-                      <TeamIdentity row={row} />
-                    </TableCell>
-                    <TableCell className="text-center">{row.played}</TableCell>
-                    <TableCell className="text-center">{row.won}</TableCell>
-                    <TableCell className="text-center">{row.drawn}</TableCell>
-                    <TableCell className="text-center">{row.lost}</TableCell>
-                    <TableCell className="text-center">{row.goalsFor}</TableCell>
-                    <TableCell className="text-center">{row.goalsAgainst}</TableCell>
-                    <TableCell className="text-center">
-                      {row.goalDifference > 0
-                        ? `+${row.goalDifference}`
-                        : row.goalDifference}
-                    </TableCell>
-                    <TableCell className="text-center font-bold">{row.points}</TableCell>
-                  </TableRow>
+                    </td>
+                    <td className="py-3 px-2">
+                      <Link href={`/teams/${row.team.id}`} className="flex items-center gap-2.5 hover:underline">
+                        {row.team.logo ? (
+                          <img src={row.team.logo} alt={row.team.name} className="h-7 w-7 shrink-0 rounded-full object-cover" />
+                        ) : (
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-bold text-foreground">
+                            {row.team.shortName.slice(0, 2)}
+                          </div>
+                        )}
+                        <span className="truncate text-sm font-medium text-foreground">{row.team.name}</span>
+                      </Link>
+                    </td>
+                    <td className="py-3 px-2 text-center text-sm tabular-nums text-muted-foreground">{row.played}</td>
+                    {expanded && (
+                      <>
+                        <td className="py-3 px-2 text-center text-sm tabular-nums text-muted-foreground">{row.won}</td>
+                        <td className="py-3 px-2 text-center text-sm tabular-nums text-muted-foreground">{row.drawn}</td>
+                        <td className="py-3 px-2 text-center text-sm tabular-nums text-muted-foreground">{row.lost}</td>
+                        <td className="py-3 px-2 text-center text-sm tabular-nums text-muted-foreground">{row.goalsFor}</td>
+                        <td className="py-3 px-2 text-center text-sm tabular-nums text-muted-foreground">{row.goalsAgainst}</td>
+                      </>
+                    )}
+                    <td className={cn(
+                      'py-3 px-2 text-center text-sm tabular-nums font-medium',
+                      row.goalDifference > 0 ? 'text-emerald-400' : row.goalDifference < 0 ? 'text-rose-400' : 'text-muted-foreground'
+                    )}>
+                      {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
+                    </td>
+                    <td className="py-3 pl-2 pr-4 text-center text-sm tabular-nums font-bold text-foreground">{row.points}</td>
+                  </tr>
                 )
               })}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
 
         {allZeros && (
