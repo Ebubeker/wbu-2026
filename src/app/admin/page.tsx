@@ -21,6 +21,8 @@ import {
   TableProperties,
   CircleDot,
   CreditCard,
+  Clock,
+  ChevronRight,
 } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
@@ -44,6 +46,7 @@ export default async function AdminDashboard() {
     playedCount,
     remainingCount,
     liveMatches,
+    upcomingMatches,
     recentGoals,
     recentCards,
   ] = await Promise.all([
@@ -59,6 +62,20 @@ export default async function AdminDashboard() {
       include: {
         homeTeam: { select: { id: true, name: true, shortName: true, logo: true } },
         awayTeam: { select: { id: true, name: true, shortName: true, logo: true } },
+      },
+    }),
+    prisma.match.findMany({
+      where: {
+        status: "SCHEDULED",
+        homeTeamId: { not: null },
+        awayTeamId: { not: null },
+      },
+      orderBy: { matchDate: "asc" },
+      take: 6,
+      include: {
+        homeTeam: { select: { id: true, name: true, shortName: true } },
+        awayTeam: { select: { id: true, name: true, shortName: true } },
+        group: { select: { name: true } },
       },
     }),
     prisma.goal.findMany({
@@ -194,6 +211,44 @@ export default async function AdminDashboard() {
           </Card>
         )}
       </div>
+
+      {/* Upcoming Matches */}
+      {upcomingMatches.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Clock className="h-5 w-5 text-muted-foreground" />
+            Upcoming Matches
+          </h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {upcomingMatches.map((match) => (
+              <Link key={match.id} href={`/admin/matches/${match.id}/live`}>
+                <Card className="transition-colors hover:bg-accent cursor-pointer">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="font-semibold">{match.homeTeam?.shortName ?? 'TBD'}</span>
+                          <span className="text-muted-foreground">vs</span>
+                          <span className="font-semibold">{match.awayTeam?.shortName ?? 'TBD'}</span>
+                        </div>
+                        <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                          {match.group && <Badge variant="outline" className="text-[10px] px-1.5 py-0">{match.group.name}</Badge>}
+                          <span>
+                            {new Date(match.matchDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            {' '}
+                            {new Date(match.matchDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="space-y-4">
