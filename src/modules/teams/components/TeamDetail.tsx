@@ -2,7 +2,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Shield, Trophy, Users, Shirt } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { PlayerCard } from '@/modules/players/components/PlayerCard'
 import { cn } from '@/lib/utils'
 import { KitPreview } from '@/modules/kits/components/KitPreview'
@@ -101,9 +100,14 @@ export function TeamDetail({ team, matches, stats: teamStats }: TeamDetailProps)
             </div>
 
             <div className="flex-1 space-y-3 text-center sm:text-left">
-              <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-                <Badge variant="secondary">{team.shortName}</Badge>
-                {team.group && <Badge variant="outline">{team.group.name}</Badge>}
+              <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground sm:justify-start">
+                <span className="font-medium uppercase tracking-wider">{team.shortName}</span>
+                {team.group && (
+                  <>
+                    <span className="text-muted-foreground/40">·</span>
+                    <span>{team.group.name}</span>
+                  </>
+                )}
               </div>
 
               <h1 className="text-4xl font-bold text-foreground">{team.name}</h1>
@@ -163,7 +167,7 @@ export function TeamDetail({ team, matches, stats: teamStats }: TeamDetailProps)
                 Roster
               </h3>
             </div>
-            <Badge variant="secondary">{team.players.length} players</Badge>
+            <span className="text-sm text-muted-foreground">{team.players.length} players</span>
           </div>
 
           {team.players.length > 0 ? (
@@ -217,7 +221,7 @@ export function TeamDetail({ team, matches, stats: teamStats }: TeamDetailProps)
                   >
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="outline">{match.stage.replaceAll('_', ' ')}</Badge>
+                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{match.stage.replaceAll('_', ' ')}</span>
                         <p className="font-medium text-foreground">
                           {isHome ? 'vs' : '@'} {opponent?.name ?? 'TBD'}
                         </p>
@@ -235,7 +239,7 @@ export function TeamDetail({ team, matches, stats: teamStats }: TeamDetailProps)
                           </span>
                         </>
                       ) : (
-                        <Badge variant="secondary">{match.status.replaceAll('_', ' ')}</Badge>
+                        <span className="text-xs font-medium text-muted-foreground">{match.status.replaceAll('_', ' ')}</span>
                       )}
                     </div>
                   </div>

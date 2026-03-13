@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import prisma from '@/lib/db'
 import { PublicLayout } from '@/components/layout/PublicLayout'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { getPlayerStats } from '@/modules/statistics/queries'
 
@@ -53,10 +52,12 @@ export default async function PlayerDetailPage({ params }: PlayerPageProps) {
           )}
           <div>
             <h1 className="text-2xl font-bold">{player.name}</h1>
-            <div className="mt-1 flex items-center gap-2">
-              <Badge variant="secondary">#{player.number}</Badge>
-              <Badge variant="outline">{player.position}</Badge>
-              <Link href={`/teams/${player.team.id}`} className="text-sm text-muted-foreground hover:underline">
+            <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="font-semibold text-foreground">#{player.number}</span>
+              <span className="text-muted-foreground/40">·</span>
+              <span className="font-medium">{player.position}</span>
+              <span className="text-muted-foreground/40">·</span>
+              <Link href={`/teams/${player.team.id}`} className="hover:underline">
                 {player.team.name}
               </Link>
             </div>

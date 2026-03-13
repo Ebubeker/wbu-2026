@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Users, Swords } from 'lucide-react'
 import type { GroupWithTeams } from '../types'
 
@@ -13,16 +12,16 @@ export function GroupCard({ group }: GroupCardProps) {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
           <span>{group.name}</span>
-          <div className="flex gap-2">
-            <Badge variant="secondary" className="flex items-center gap-1">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
               <Users className="h-3 w-3" />
               {group._count?.teams ?? group.teams.length}
-            </Badge>
+            </span>
             {group._count?.matches !== undefined && (
-              <Badge variant="outline" className="flex items-center gap-1">
+              <span className="inline-flex items-center gap-1">
                 <Swords className="h-3 w-3" />
                 {group._count.matches}
-              </Badge>
+              </span>
             )}
           </div>
         </CardTitle>

@@ -1,5 +1,4 @@
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { PitchView } from './PitchView'
 import type { LineupData } from '../types'
 import type { Formation } from '@/lib/formations'
@@ -40,7 +39,7 @@ export function LineupDisplay({
             <div className="p-3 text-center border-b border-border">
               <p className="font-semibold text-sm">{homeTeamName ?? 'Home'}</p>
               {homeLineup && (
-                <Badge variant="outline" className="mt-1">{homeLineup.formation}</Badge>
+                <span className="mt-1 inline-block text-xs text-muted-foreground">{homeLineup.formation}</span>
               )}
             </div>
             {homeLineup ? (
@@ -68,7 +67,7 @@ export function LineupDisplay({
             <div className="p-3 text-center border-b border-border">
               <p className="font-semibold text-sm">{awayTeamName ?? 'Away'}</p>
               {awayLineup && (
-                <Badge variant="outline" className="mt-1">{awayLineup.formation}</Badge>
+                <span className="mt-1 inline-block text-xs text-muted-foreground">{awayLineup.formation}</span>
               )}
             </div>
             {awayLineup ? (

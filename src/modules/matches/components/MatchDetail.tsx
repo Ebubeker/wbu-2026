@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { Badge } from '@/components/ui/badge'
+import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { formatDate, formatTime, formatMatchMinute } from '@/lib/utils'
@@ -23,22 +23,23 @@ type TimelineEvent = {
   minute: number
   type: 'goal' | 'card'
   teamId: string
+  playerId: string
   playerName: string
   playerNumber: number
   isOwnGoal?: boolean
   cardType?: 'YELLOW' | 'RED'
 }
 
-function EventBadge({ event }: { event: TimelineEvent }) {
+function EventIcon({ event }: { event: TimelineEvent }) {
   if (event.type === 'goal') {
-    return <Badge className="border-emerald-300/20 bg-emerald-400/15 text-emerald-100">Goal</Badge>
+    return <span className="text-base sm:text-lg" title="Goal">⚽</span>
   }
 
   if (event.cardType === 'YELLOW') {
-    return <Badge className="border-amber-300/20 bg-amber-400/15 text-amber-100">Yellow</Badge>
+    return <span className="text-base sm:text-lg" title="Yellow card">🟨</span>
   }
 
-  return <Badge className="border-rose-300/20 bg-rose-400/15 text-rose-100">Red</Badge>
+  return <span className="text-base sm:text-lg" title="Red card">🟥</span>
 }
 
 function TeamPanel({
@@ -51,24 +52,24 @@ function TeamPanel({
   logo: string | null
 }) {
   return (
-    <div className="flex flex-col items-center gap-3 text-center">
-      <div className="relative h-20 w-20 overflow-hidden rounded-[20px] border border-white/10 bg-background p-3 sm:h-24 sm:w-24">
+    <div className="flex flex-col items-center gap-2 text-center sm:gap-3">
+      <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-border/60 bg-muted/30 p-2.5 sm:h-24 sm:w-24 sm:rounded-[20px] sm:p-3">
         {logo ? (
           <Image
             src={logo}
             alt={name}
             fill
-            className="object-contain p-3"
+            className="object-contain p-2.5 sm:p-3"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-foreground">
+          <div className="flex h-full w-full items-center justify-center text-base font-semibold text-foreground sm:text-lg">
             {shortName}
           </div>
         )}
       </div>
       <div>
-        <p className="text-base font-semibold text-foreground sm:text-lg">{name}</p>
-        <p className="mt-1 text-xs uppercase tracking-[0.22em] text-muted-foreground">
+        <p className="text-sm font-semibold text-foreground sm:text-lg">{name}</p>
+        <p className="mt-0.5 text-[10px] uppercase tracking-[0.22em] text-muted-foreground sm:mt-1 sm:text-xs">
           {shortName}
         </p>
       </div>
@@ -89,6 +90,7 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
       minute: goal.minute,
       type: 'goal' as const,
       teamId: goal.team.id,
+      playerId: goal.player.id,
       playerName: goal.player.name,
       playerNumber: goal.player.number,
       isOwnGoal: goal.isOwnGoal,
@@ -98,6 +100,7 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
       minute: card.minute,
       type: 'card' as const,
       teamId: card.team.id,
+      playerId: card.player.id,
       playerName: card.player.name,
       playerNumber: card.player.number,
       cardType: card.type,
@@ -200,10 +203,16 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
   }, [match.id, isLive])
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card className="overflow-hidden">
-        <CardContent className="p-6 sm:p-8">
-          <div className="grid gap-6 lg:grid-cols-[1fr_auto_1fr] lg:items-center">
+        <CardContent className="px-4 py-5 sm:p-8">
+          {/* Status badge */}
+          <div className="mb-4 flex justify-center sm:mb-6">
+            <StatusBadge status={match.status} />
+          </div>
+
+          {/* Teams + Score — always horizontal */}
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-8">
             <TeamPanel
               name={match.homeTeam?.name ?? match.homePlaceholder ?? '—'}
               shortName={match.homeTeam?.shortName ?? match.homePlaceholder ?? '—'}
@@ -211,53 +220,47 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
             />
 
             <div className="text-center">
-              <div className="flex justify-center">
-                <StatusBadge status={match.status} />
-              </div>
+              {isScheduled ? (
+                <div className="rounded-2xl border border-border/50 bg-muted/30 px-4 py-3 sm:rounded-[20px] sm:px-6 sm:py-5">
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground sm:text-xs">
+                    Kick-off
+                  </p>
+                  <p className="mt-1 text-2xl font-bold text-foreground sm:mt-2 sm:text-4xl">
+                    {formatTime(match.matchDate)}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground sm:mt-2 sm:text-sm">
+                    {formatDate(match.matchDate)}
+                  </p>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-border/50 bg-muted/30 px-4 py-3 sm:rounded-[20px] sm:px-6 sm:py-5">
+                  <div className="flex items-center justify-center gap-2 text-3xl font-bold tabular-nums text-foreground sm:gap-3 sm:text-6xl">
+                    <span>{match.homeScore}</span>
+                    <span className="text-muted-foreground/50">:</span>
+                    <span>{match.awayScore}</span>
+                  </div>
 
-              <div className="mt-4 rounded-[20px] border border-white/10 bg-background px-5 py-5">
-                {isScheduled ? (
-                  <>
-                    <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">
-                      Kick-off
-                    </p>
-                    <p className="mt-2 text-3xl font-bold text-foreground sm:text-4xl">
-                      {formatTime(match.matchDate)}
-                    </p>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {formatDate(match.matchDate)}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center justify-center gap-3 text-5xl font-bold tabular-nums text-foreground sm:text-6xl">
-                      <span>{match.homeScore}</span>
-                      <span className="text-muted-foreground">-</span>
-                      <span>{match.awayScore}</span>
+                  {isLive && (
+                    <div className="mt-2 flex items-center justify-center gap-1.5 text-xs font-medium text-rose-600 sm:mt-3 sm:gap-2 sm:text-sm">
+                      <Radio className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span>
+                        <LiveMinute
+                          status={match.status}
+                          timerStartedAt={match.timerStartedAt}
+                          timerPausedAt={match.timerPausedAt}
+                          pausedElapsed={match.pausedElapsed}
+                        />
+                      </span>
                     </div>
+                  )}
 
-                    {isLive && (
-                      <div className="mt-3 flex items-center justify-center gap-2 text-sm font-medium text-rose-100">
-                        <Radio className="h-4 w-4 text-rose-300" />
-                        <span>
-                          <LiveMinute
-                            status={match.status}
-                            timerStartedAt={match.timerStartedAt}
-                            timerPausedAt={match.timerPausedAt}
-                            pausedElapsed={match.pausedElapsed}
-                          />
-                        </span>
-                      </div>
-                    )}
-
-                    {isFullTime && (
-                      <div className="mt-3">
-                        <Badge variant="secondary">Full Time</Badge>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+                  {isFullTime && (
+                    <p className="mt-2 text-xs font-medium uppercase tracking-wider text-emerald-600 sm:mt-3 sm:text-sm">
+                      Full Time
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             <TeamPanel
@@ -266,41 +269,47 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
               logo={match.awayTeam?.logo ?? null}
             />
           </div>
+
+          {/* Match info pills — inside the card */}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:mt-6">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+              <CalendarIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span>{formatDate(match.matchDate)}</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+              <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span>{formatTime(match.matchDate)}</span>
+            </div>
+            {match.venue && (
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
+                <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span>{match.venue}</span>
+              </div>
+            )}
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{match.stage.replaceAll('_', ' ')}</span>
+            {match.group && (
+              <>
+                <span className="text-muted-foreground/40">·</span>
+                <span className="text-xs font-medium text-muted-foreground">{match.group.name}</span>
+              </>
+            )}
+          </div>
         </CardContent>
       </Card>
 
-      <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-background px-4 py-2">
-          <CalendarIcon className="h-4 w-4" />
-          <span>{formatDate(match.matchDate)}</span>
-        </div>
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-background px-4 py-2">
-          <Clock className="h-4 w-4" />
-          <span>{formatTime(match.matchDate)}</span>
-        </div>
-        {match.venue && (
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-background px-4 py-2">
-            <MapPin className="h-4 w-4" />
-            <span>{match.venue}</span>
-          </div>
-        )}
-        <Badge variant="secondary">{match.stage.replaceAll('_', ' ')}</Badge>
-        {match.group && <Badge variant="outline">{match.group.name}</Badge>}
-      </div>
-
       {timelineEvents.length > 0 && (
         <Card>
-          <CardContent className="p-5 sm:p-6">
-            <div className="mb-4">
-              <p className="text-xs uppercase tracking-[0.28em] text-primary/75">
+          <CardContent className="p-4 sm:p-6">
+            <div className="mb-3 sm:mb-4">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-primary/75 sm:text-xs">
                 Match Story
               </p>
-              <h3 className="mt-2 text-2xl font-semibold text-foreground">
+              <h3 className="mt-1 text-lg font-semibold text-foreground sm:mt-2 sm:text-2xl">
                 Events timeline
               </h3>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {timelineEvents.map((event) => {
                 const isHome = event.teamId === match.homeTeam?.id
 
@@ -311,24 +320,24 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
                   >
                     <div
                       className={cn(
-                        'flex max-w-[90%] items-center gap-3 rounded-[14px] border border-white/10 bg-background px-4 py-3',
+                        'flex max-w-[85%] items-center gap-2 rounded-xl border border-border/60 bg-muted/30 px-3 py-2.5 sm:max-w-[90%] sm:gap-3 sm:rounded-[14px] sm:px-4 sm:py-3',
                         !isHome && 'flex-row-reverse text-right'
                       )}
                     >
                       <div className="text-xs font-semibold tabular-nums text-primary">
                         {event.minute}&apos;
                       </div>
-                      <EventBadge event={event} />
-                      <div>
-                        <p className="font-semibold text-foreground">
+                      <EventIcon event={event} />
+                      <div className="min-w-0">
+                        <Link href={`/players/${event.playerId}`} className="truncate text-sm font-semibold text-foreground hover:text-primary sm:text-base">
                           {event.playerName}
                           {event.isOwnGoal && (
-                            <span className="ml-2 text-xs uppercase tracking-[0.18em] text-rose-200">
-                              Own Goal
+                            <span className="ml-1.5 text-[10px] uppercase tracking-[0.18em] text-rose-500 sm:ml-2 sm:text-xs">
+                              OG
                             </span>
                           )}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
+                        </Link>
+                        <p className="text-xs text-muted-foreground sm:text-sm">
                           #{event.playerNumber}
                         </p>
                       </div>
@@ -374,31 +383,32 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {match.homeTeam && (
         <Card>
-          <CardContent className="p-5 sm:p-6">
-            <div className="mb-4">
-              <p className="text-xs uppercase tracking-[0.28em] text-primary/75">
+          <CardContent className="p-4 sm:p-6">
+            <div className="mb-3 sm:mb-4">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-primary/75 sm:text-xs">
                 Home Squad
               </p>
-              <h3 className="mt-2 text-2xl font-semibold text-foreground">
+              <h3 className="mt-1 text-lg font-semibold text-foreground sm:mt-2 sm:text-2xl">
                 {match.homeTeam.name}
               </h3>
             </div>
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-1 sm:gap-2">
               {match.homeTeam.players.map((player) => (
-                <div
+                <Link
                   key={player.id}
-                  className="flex items-center gap-3 rounded-2xl border border-white/10 bg-background px-3 py-3 text-sm"
+                  href={`/players/${player.id}`}
+                  className="flex items-center gap-2 rounded-xl border border-border/60 bg-muted/30 px-2.5 py-2 text-sm transition-colors hover:bg-muted/60 sm:gap-3 sm:rounded-2xl sm:px-3 sm:py-3"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary font-semibold text-foreground">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary text-xs font-semibold text-foreground sm:h-10 sm:w-10 sm:rounded-2xl sm:text-sm">
                     #{player.number}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-foreground">{player.name}</p>
-                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                    <p className="truncate text-xs font-medium text-foreground sm:text-sm">{player.name}</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground sm:text-xs">
                       {player.position}
                     </p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </CardContent>
@@ -407,31 +417,32 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
 
         {match.awayTeam && (
         <Card>
-          <CardContent className="p-5 sm:p-6">
-            <div className="mb-4">
-              <p className="text-xs uppercase tracking-[0.28em] text-primary/75">
+          <CardContent className="p-4 sm:p-6">
+            <div className="mb-3 sm:mb-4">
+              <p className="text-[10px] uppercase tracking-[0.28em] text-primary/75 sm:text-xs">
                 Away Squad
               </p>
-              <h3 className="mt-2 text-2xl font-semibold text-foreground">
+              <h3 className="mt-1 text-lg font-semibold text-foreground sm:mt-2 sm:text-2xl">
                 {match.awayTeam.name}
               </h3>
             </div>
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-1 sm:gap-2">
               {match.awayTeam.players.map((player) => (
-                <div
+                <Link
                   key={player.id}
-                  className="flex items-center gap-3 rounded-2xl border border-white/10 bg-background px-3 py-3 text-sm"
+                  href={`/players/${player.id}`}
+                  className="flex items-center gap-2 rounded-xl border border-border/60 bg-muted/30 px-2.5 py-2 text-sm transition-colors hover:bg-muted/60 sm:gap-3 sm:rounded-2xl sm:px-3 sm:py-3"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-secondary font-semibold text-foreground">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary text-xs font-semibold text-foreground sm:h-10 sm:w-10 sm:rounded-2xl sm:text-sm">
                     #{player.number}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-foreground">{player.name}</p>
-                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                    <p className="truncate text-xs font-medium text-foreground sm:text-sm">{player.name}</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground sm:text-xs">
                       {player.position}
                     </p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </CardContent>

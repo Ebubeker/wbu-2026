@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import type { StandingsRow } from '../types'
@@ -51,7 +50,7 @@ export function StandingsTable({
             )}
           </div>
           <div className="flex items-center gap-3">
-            <Badge variant="secondary">Top {qualifyCount} advance</Badge>
+            <span className="text-xs text-muted-foreground">Top {qualifyCount} advance</span>
             {/* Short / Full toggle */}
             <div className="flex">
               <button

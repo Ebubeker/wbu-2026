@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { GitBranch } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { EmptyState } from '@/components/common/EmptyState'
 import { cn } from '@/lib/utils'
 import type { BracketMatch, BracketRound } from '../types'
@@ -100,9 +99,9 @@ function BracketMatchCard({ match }: { match: BracketMatch }) {
     >
       <CardContent className="p-4 space-y-3">
         <div className="flex items-center justify-between gap-2">
-          <Badge variant="outline" className="text-xs">
+          <span className="text-xs text-muted-foreground">
             {match.status === 'SCHEDULED' ? 'Scheduled' : match.status === 'FULL_TIME' ? 'Full time' : match.status.replace('_', ' ')}
-          </Badge>
+          </span>
           {live && (
             <span className="flex items-center gap-1 text-xs font-semibold text-red-600">
               <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse-live" />
@@ -160,9 +159,9 @@ export function BracketView({ rounds }: BracketViewProps) {
         {rounds.map((round, roundIndex) => (
           <div key={round.stage} className="flex items-start">
             <div className="flex min-w-[280px] flex-col items-center">
-              <Badge variant="secondary" className="mb-4">
+              <span className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 {round.label}
-              </Badge>
+              </span>
               <div
                 className="flex flex-col justify-center gap-6"
                 style={{
@@ -192,7 +191,7 @@ export function BracketView({ rounds }: BracketViewProps) {
         {rounds.map((round) => (
           <div key={round.stage} className="space-y-3">
             <div className="flex justify-center">
-              <Badge variant="secondary">{round.label}</Badge>
+              <span className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">{round.label}</span>
             </div>
             <div className="space-y-3">
               {round.matches.map((match) => (

@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
 import { EmptyState } from '@/components/common/EmptyState'
 import { Calendar } from 'lucide-react'
 import { MatchCard } from './MatchCard'
@@ -103,7 +102,7 @@ export function MatchSchedule({ matches, groups }: MatchScheduleProps) {
                     <p className="text-lg font-semibold text-foreground">{section.label}</p>
                     <p className="text-sm text-muted-foreground">{section.date}</p>
                   </div>
-                  <Badge variant="outline">{section.matches.length} matches</Badge>
+                  <span className="text-xs text-muted-foreground">{section.matches.length} matches</span>
                 </div>
 
                 <div className="space-y-3">

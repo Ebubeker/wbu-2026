@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Clock3, MapPin, Radio } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { LiveMinute } from './LiveMinute'
 import type { MatchData } from '../types'
 
@@ -70,25 +69,30 @@ export function MatchCard({ match, linkPrefix = '/matches' }: MatchCardProps) {
     <Link href={`${linkPrefix}/${match.id}`} className="block">
       <div className="rounded-xl border border-border bg-card p-4 transition-colors hover:bg-secondary/50">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline">{match.stage.replaceAll('_', ' ')}</Badge>
-            {match.group && <Badge variant="outline">{match.group.name}</Badge>}
+          <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+            <span className="font-medium uppercase tracking-wider">{match.stage.replaceAll('_', ' ')}</span>
+            {match.group && (
+              <>
+                <span className="text-muted-foreground/40">·</span>
+                <span>{match.group.name}</span>
+              </>
+            )}
           </div>
 
           {isLive ? (
-            <Badge className="border-red-200 bg-red-50 text-red-600">
-              <Radio className="mr-1 h-3 w-3" />
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-600">
+              <Radio className="h-3 w-3" />
               <LiveMinute
                 status={match.status}
                 timerStartedAt={match.timerStartedAt}
                 timerPausedAt={match.timerPausedAt}
                 pausedElapsed={match.pausedElapsed}
               />
-            </Badge>
+            </span>
           ) : (
-            <Badge variant="outline">
+            <span className="text-xs text-muted-foreground">
               {isFinished ? 'Full time' : formatTime(match.matchDate)}
-            </Badge>
+            </span>
           )}
         </div>
 
