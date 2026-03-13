@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import {
   Table,
@@ -46,6 +49,54 @@ function TeamIdentity({ row }: { row: StandingsRow }) {
   )
 }
 
+function MobileRow({ row, isQualifying, expanded }: { row: StandingsRow; isQualifying: boolean; expanded: boolean }) {
+  return (
+    <tr className="border-b border-white/5">
+      <td className="py-2.5 pl-4 pr-1">
+        <span className={cn(
+          'inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold',
+          isQualifying
+            ? 'bg-emerald-500 text-white'
+            : 'bg-white/5 text-muted-foreground'
+        )}>
+          {row.position}
+        </span>
+      </td>
+      <td className="py-2.5 px-1">
+        <Link href={`/teams/${row.team.id}`} className="flex items-center gap-2.5 hover:underline">
+          {row.team.logo ? (
+            <img src={row.team.logo} alt={row.team.name} className="h-6 w-6 shrink-0 rounded-full object-cover" />
+          ) : (
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[9px] font-bold text-foreground">
+              {row.team.shortName.slice(0, 2)}
+            </div>
+          )}
+          <span className="truncate text-[13px] font-medium text-foreground">{row.team.name}</span>
+        </Link>
+      </td>
+      <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.played}</td>
+      {expanded && (
+        <>
+          <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.won}</td>
+          <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.drawn}</td>
+          <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.lost}</td>
+        </>
+      )}
+      <td className={cn(
+        'py-2.5 px-1 text-center text-[13px] tabular-nums font-medium',
+        row.goalDifference > 0 ? 'text-emerald-400' : row.goalDifference < 0 ? 'text-rose-400' : 'text-muted-foreground'
+      )}>
+        {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
+      </td>
+      {expanded && (
+        <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">
+          {row.goalsFor}:{row.goalsAgainst}
+        </td>
+      )}
+      <td className="py-2.5 pl-1 pr-4 text-center text-[14px] tabular-nums font-bold text-foreground">{row.points}</td>
+    </tr>
+  )
+}
 
 export function StandingsTable({
   groupId,
@@ -53,6 +104,8 @@ export function StandingsTable({
   standings,
   qualifyCount = 2,
 }: StandingsTableProps) {
+  const [expanded, setExpanded] = useState(false)
+
   const allZeros = standings.every(
     (row) =>
       row.played === 0 &&
@@ -83,71 +136,70 @@ export function StandingsTable({
           <Badge variant="secondary">Top {qualifyCount} advance</Badge>
         </div>
 
+        {/* Mobile view */}
         <div className="md:hidden">
+          {/* Toggle */}
+          <div className="flex items-center justify-end gap-1 px-4 pt-3">
+            <button
+              onClick={() => setExpanded(false)}
+              className={cn(
+                'rounded-l-lg px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors',
+                !expanded
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-white/5 text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Short
+            </button>
+            <button
+              onClick={() => setExpanded(true)}
+              className={cn(
+                'rounded-r-lg px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition-colors',
+                expanded
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-white/5 text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Full
+            </button>
+          </div>
+
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[480px]">
+            <table className={cn('w-full', expanded && 'min-w-[480px]')}>
               <thead>
                 <tr className="border-b border-white/10">
                   <th className="py-3 pl-4 pr-1 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">#</th>
                   <th className="py-3 px-1 text-left text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Team</th>
                   <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">P</th>
-                  <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">W</th>
-                  <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">D</th>
-                  <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">L</th>
+                  {expanded && (
+                    <>
+                      <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">W</th>
+                      <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">D</th>
+                      <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-8">L</th>
+                    </>
+                  )}
                   <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-10">DIFF</th>
-                  <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-14">GLS</th>
+                  {expanded && (
+                    <th className="py-3 px-1 text-center text-[11px] font-medium uppercase tracking-wider text-muted-foreground w-14">GLS</th>
+                  )}
                   <th className="py-3 pl-1 pr-4 text-center text-[11px] font-bold uppercase tracking-wider text-foreground w-10">PTS</th>
                 </tr>
               </thead>
               <tbody>
-                {standings.map((row) => {
-                  const isQualifying = row.position <= qualifyCount
-                  return (
-                    <tr key={row.team.id} className="border-b border-white/5">
-                      <td className="py-2.5 pl-4 pr-1">
-                        <span className={cn(
-                          'inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold',
-                          isQualifying
-                            ? 'bg-emerald-500 text-white'
-                            : 'bg-white/5 text-muted-foreground'
-                        )}>
-                          {row.position}
-                        </span>
-                      </td>
-                      <td className="py-2.5 px-1">
-                        <Link href={`/teams/${row.team.id}`} className="flex items-center gap-2.5 hover:underline">
-                          {row.team.logo ? (
-                            <img src={row.team.logo} alt={row.team.name} className="h-6 w-6 shrink-0 rounded-full object-cover" />
-                          ) : (
-                            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-[9px] font-bold text-foreground">
-                              {row.team.shortName.slice(0, 2)}
-                            </div>
-                          )}
-                          <span className="truncate text-[13px] font-medium text-foreground">{row.team.name}</span>
-                        </Link>
-                      </td>
-                      <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.played}</td>
-                      <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.won}</td>
-                      <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.drawn}</td>
-                      <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">{row.lost}</td>
-                      <td className={cn(
-                        'py-2.5 px-1 text-center text-[13px] tabular-nums font-medium',
-                        row.goalDifference > 0 ? 'text-emerald-400' : row.goalDifference < 0 ? 'text-rose-400' : 'text-muted-foreground'
-                      )}>
-                        {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
-                      </td>
-                      <td className="py-2.5 px-1 text-center text-[13px] tabular-nums text-muted-foreground">
-                        {row.goalsFor}:{row.goalsAgainst}
-                      </td>
-                      <td className="py-2.5 pl-1 pr-4 text-center text-[14px] tabular-nums font-bold text-foreground">{row.points}</td>
-                    </tr>
-                  )
-                })}
+                {standings.map((row) => (
+                  <MobileRow
+                    key={row.team.id}
+                    row={row}
+                    isQualifying={row.position <= qualifyCount}
+                    expanded={expanded}
+                  />
+                ))}
               </tbody>
             </table>
           </div>
         </div>
 
+        {/* Desktop view */}
         <div className="hidden p-4 md:block">
           <Table>
             <TableHeader>
