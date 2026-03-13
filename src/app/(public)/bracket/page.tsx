@@ -4,7 +4,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout"
 import { BracketView } from "@/modules/bracket/components/BracketView"
 import type { BracketRound } from "@/modules/bracket/types"
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 30
 
 const STAGE_LABELS: Record<string, string> = {
   QUARTERFINAL: "Quarter-Finals",

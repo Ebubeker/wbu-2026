@@ -15,7 +15,7 @@ import {
   getMatchRecords,
 } from '@/modules/statistics/queries'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 30
 
 export const metadata: Metadata = {
   title: 'Statistics | WBU 2026',

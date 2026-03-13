@@ -5,7 +5,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout"
 import { TeamDetail } from "@/modules/teams/components/TeamDetail"
 import { getTeamStats } from "@/modules/statistics/queries"
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 30
 
 interface TeamPageProps {
   params: Promise<{ id: string }>

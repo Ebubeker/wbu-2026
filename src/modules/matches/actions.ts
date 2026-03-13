@@ -6,10 +6,12 @@ import { matchSchema } from '@/lib/validations'
 import type { MatchFormValues } from './types'
 
 function revalidateMatchPaths() {
-  revalidatePath('/matches')
+  revalidatePath('/', 'layout')
+  revalidatePath('/matches', 'layout')
+  revalidatePath('/standings', 'layout')
+  revalidatePath('/statistics', 'layout')
+  revalidatePath('/bracket', 'layout')
   revalidatePath('/admin/matches')
-  revalidatePath('/standings')
-  revalidatePath('/')
 }
 
 export async function createMatch(data: MatchFormValues) {

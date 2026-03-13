@@ -4,7 +4,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout"
 import { StandingsTable } from "@/modules/standings/components/StandingsTable"
 import { calculateStandings } from "@/modules/standings/utils"
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 30
 
 export default async function StandingsPage() {
   const groups = await prisma.group.findMany({

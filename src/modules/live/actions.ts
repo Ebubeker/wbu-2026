@@ -8,10 +8,12 @@ import { broadcastToMatch } from './sse'
 import { autoFillLineup } from '@/modules/lineups/actions'
 
 function revalidateMatchPaths() {
-  revalidatePath('/matches')
+  revalidatePath('/', 'layout')
+  revalidatePath('/matches', 'layout')
+  revalidatePath('/standings', 'layout')
+  revalidatePath('/statistics', 'layout')
+  revalidatePath('/bracket', 'layout')
   revalidatePath('/admin/matches')
-  revalidatePath('/standings')
-  revalidatePath('/')
 }
 
 async function recalculateScores(matchId: string) {
