@@ -28,7 +28,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
-import { Badge } from "@/components/ui/badge"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { UserPlus, Users, Trash2, Camera, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
@@ -72,6 +78,33 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
   const [deleteTarget, setDeleteTarget] = useState<PlayerItem | null>(null)
   const [photoTarget, setPhotoTarget] = useState<PlayerItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [updatingPosition, setUpdatingPosition] = useState<string | null>(null)
+
+  async function handlePositionChange(playerId: string, playerName: string, newPosition: string) {
+    setUpdatingPosition(playerId)
+    try {
+      const res = await fetch(`/api/players/${playerId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: players?.find(p => p.id === playerId)?.name,
+          number: players?.find(p => p.id === playerId)?.number,
+          position: newPosition,
+          teamId: id,
+        }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error || "Failed to update position")
+      }
+      toast.success(`${playerName} → ${newPosition}`)
+      mutatePlayers()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update position")
+    } finally {
+      setUpdatingPosition(null)
+    }
+  }
 
   async function handleDeletePlayer() {
     if (!deleteTarget) return
@@ -183,11 +216,25 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
                           )}
                         </TableCell>
                         <TableCell className="font-medium">{player.name}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{player.number}</Badge>
+                        <TableCell className="tabular-nums">
+                          {player.number}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary">{player.position}</Badge>
+                          <Select
+                            value={player.position}
+                            onValueChange={(val) => handlePositionChange(player.id, player.name, val)}
+                            disabled={updatingPosition === player.id}
+                          >
+                            <SelectTrigger className="h-8 w-[100px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="GK">GK</SelectItem>
+                              <SelectItem value="DEF">DEF</SelectItem>
+                              <SelectItem value="MID">MID</SelectItem>
+                              <SelectItem value="FWD">FWD</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
