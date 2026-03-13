@@ -11,6 +11,9 @@ export interface MatchData {
   matchDate: Date | string
   venue: string | null
   matchMinute: number
+  timerStartedAt?: Date | string | null
+  timerPausedAt?: Date | string | null
+  pausedElapsed?: number
   groupId: string | null
   group?: { id: string; name: string } | null
 }

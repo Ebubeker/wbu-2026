@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Image from 'next/image'
 import { Shield, Trophy, Users, Shirt } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
@@ -5,8 +6,10 @@ import { Badge } from '@/components/ui/badge'
 import { PlayerCard } from '@/modules/players/components/PlayerCard'
 import { cn } from '@/lib/utils'
 import { KitPreview } from '@/modules/kits/components/KitPreview'
+import { TeamStatsSection } from '@/modules/statistics/components/TeamStatsSection'
 import type { TeamWithPlayers } from '../types'
 import type { PlayerData } from '@/modules/players/types'
+import type { TeamStats } from '@/modules/statistics/types'
 
 interface MatchEntry {
   id: string
@@ -25,6 +28,7 @@ interface MatchEntry {
 interface TeamDetailProps {
   team: TeamWithPlayers
   matches: MatchEntry[]
+  stats?: TeamStats
 }
 
 function getMatchResult(
@@ -57,7 +61,7 @@ function StatCard({
   )
 }
 
-export function TeamDetail({ team, matches }: TeamDetailProps) {
+export function TeamDetail({ team, matches, stats: teamStats }: TeamDetailProps) {
   const completedMatches = matches.filter((match) => match.status === 'FULL_TIME')
   const stats = {
     played: completedMatches.length,
@@ -139,28 +143,10 @@ export function TeamDetail({ team, matches }: TeamDetailProps) {
         </CardContent>
       </Card>
 
-      {stats.played > 0 && (
+      {teamStats && teamStats.played > 0 && (
         <Card>
           <CardContent className="p-5 sm:p-6">
-            <div className="mb-4">
-              <p className="text-xs uppercase tracking-[0.28em] text-primary/75">
-                Performance
-              </p>
-              <h3 className="mt-2 flex items-center justify-center gap-2 text-2xl font-semibold text-foreground sm:justify-start">
-                <Trophy className="h-5 w-5 text-primary" />
-                Statistics
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-7">
-              <StatCard label="Played" value={stats.played} />
-              <StatCard label="Wins" value={stats.wins} className="border-emerald-400/20 bg-emerald-500/10" />
-              <StatCard label="Draws" value={stats.draws} className="border-amber-400/20 bg-amber-500/10" />
-              <StatCard label="Losses" value={stats.losses} className="border-rose-400/20 bg-rose-500/10" />
-              <StatCard label="GF" value={stats.goalsFor} />
-              <StatCard label="GA" value={stats.goalsAgainst} />
-              <StatCard label="GD" value={goalDifference > 0 ? `+${goalDifference}` : goalDifference} />
-            </div>
+            <TeamStatsSection stats={teamStats} />
           </CardContent>
         </Card>
       )}
@@ -183,10 +169,11 @@ export function TeamDetail({ team, matches }: TeamDetailProps) {
           {team.players.length > 0 ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {team.players.map((player) => (
-                <PlayerCard
-                  key={player.id}
-                  player={player as PlayerData}
-                />
+                <Link key={player.id} href={`/players/${player.id}`}>
+                  <PlayerCard
+                    player={player as PlayerData}
+                  />
+                </Link>
               ))}
             </div>
           ) : (

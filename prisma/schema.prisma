@@ -147,6 +147,9 @@ model Match {
   matchDate       DateTime
   venue           String?
   matchMinute     Int         @default(0)
+  timerStartedAt  DateTime?
+  timerPausedAt   DateTime?
+  pausedElapsed   Int         @default(0)
   goals           Goal[]
   cards           Card[]
   lineups         Lineup[]
@@ -174,6 +177,8 @@ model Goal {
   createdAt DateTime @default(now())
 
   @@index([matchId])
+  @@index([playerId])
+  @@index([teamId])
 }
 
 model Card {
@@ -189,6 +194,8 @@ model Card {
   createdAt DateTime @default(now())
 
   @@index([matchId])
+  @@index([playerId])
+  @@index([teamId])
 }
 
 model Kit {

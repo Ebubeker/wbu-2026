@@ -9,6 +9,9 @@ export interface SSEMessage {
     | 'card_removed'
     | 'connected'
     | 'match_ended'
+    | 'timer_start'
+    | 'timer_pause'
+    | 'timer_resume'
   data: Record<string, unknown>
 }
 

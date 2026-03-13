@@ -26,6 +26,14 @@ export async function GET(
           include: { player: true, team: true },
           orderBy: { minute: 'asc' },
         },
+        lineups: {
+          include: {
+            players: {
+              include: { player: true },
+              orderBy: { positionSlot: 'asc' },
+            },
+          },
+        },
       },
     })
 

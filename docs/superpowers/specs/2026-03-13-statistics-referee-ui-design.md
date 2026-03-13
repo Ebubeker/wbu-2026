@@ -55,35 +55,56 @@ Goals, cards, players, teams, groups — all existing tables have the fields req
 ### Route
 `/admin/matches/[id]/live` — existing route, **redesigned** for mobile.
 
-### Main Screen
+### Main Screen (when match is SCHEDULED)
+- **Scoreboard** — team logos/names, large and centered
+- **Prominent "Start Match" button** — full-width, tall, green, impossible to miss. This is the primary call-to-action. No scrolling required to find it.
+- **Match info** below (date, venue, lineups if submitted)
+
+### Main Screen (when match is LIVE — FIRST_HALF, HALF_TIME, SECOND_HALF)
 - **Large timer** at top center — auto-counting, derived from `timerStartedAt`
-- **Match status badge** (FIRST_HALF, HALF_TIME, SECOND_HALF, FULL_TIME)
+- **Match status badge** (FIRST_HALF, HALF_TIME, SECOND_HALF)
 - **Scoreboard** — team logos/names + score, large and centered
-- **Action buttons** — two large buttons: "⚽ Goal" and "🟨 Card"
-- **Status control button** — context-aware: "Start Match" → "Half Time" → "Start 2nd Half" → "Full Time"
+- **"ACTION" button** — single large rectangular button, full-width, prominent. This is the only action entry point.
+- **Status control button** — context-aware: "Half Time" / "Start 2nd Half" / "Full Time" (below the action button, secondary style)
 - **Event timeline** — scrollable list of goals/cards below, each with delete/edit icons
 - **Pause/Resume timer** button (small, secondary)
 
-### Full-Screen Step Wizard — Goal Flow
-1. **Step 1: Which team scored?** — Two large cards showing team name + logo (Home / Away). Also an "Own Goal" toggle at bottom. "Which team scored?" means **which team benefits from the goal** (gets the point).
-2. **Step 2: Which player?** — Grid of player cards from that team's **lineup** (number + name). Large tappable cards. If own goal is toggled, show the **other team's lineup** instead (the player who scored the own goal). Falls back to full squad if no lineup exists.
-3. **Step 3: Confirm** — Summary card showing: team, player, minute (auto-filled from timer, editable). "Save" and "Cancel" buttons.
+### Main Screen (when FULL_TIME)
+- **Scoreboard** with final score
+- **"Match Ended"** label
+- **Reopen Match** button (secondary)
+- **Event timeline** (read-only, no delete/edit)
+
+### Action Flow — Step-by-Step Full Views
+
+Tapping the **"ACTION"** button replaces the entire view with a choice screen:
+
+**Action Choice View:**
+- **"Goal"** — large box/card at the top half of the screen
+- **"Card"** — large box/card at the bottom half of the screen
+- **Back/X** button to return to main screen
+
+**Goal Flow (each step is a full view replacement, not an overlay):**
+1. **View 1: Which team?** — Two large cards showing team name + logo (Home / Away). Also an "Own Goal" toggle at bottom. "Which team scored?" means **which team benefits from the goal**.
+2. **View 2: Which player?** — Scrollable list of player cards from that team's **lineup** (number + name displayed as cards, not a dropdown). If own goal is toggled, show the **other team's lineup** instead. Falls back to full squad if no lineup exists.
+3. **Selecting a player immediately saves the event** — no confirm step. A success toast appears and the view returns to the main screen.
+
+**Card Flow (each step is a full view replacement):**
+1. **View 1: Card type?** — Two large cards: Yellow and Red (top/bottom layout)
+2. **View 2: Which team?** — Two large team cards
+3. **View 3: Which player?** — Scrollable list of player cards from that team's lineup (falls back to full squad if no lineup)
+4. **Selecting a player immediately saves the event** — no confirm step. Toast + return to main.
 
 **Data model mapping:** When own goal is toggled, the wizard sets `teamId` to the player's actual team and `isOwnGoal = true`. The existing `recalculateScores` logic then credits the benefiting team correctly.
 
-### Full-Screen Step Wizard — Card Flow
-1. **Step 1: Card type?** — Two large cards: Yellow (🟨) and Red (🟥)
-2. **Step 2: Which team?** — Two large team cards
-3. **Step 3: Which player?** — Grid of player cards from that team's lineup (falls back to full squad if no lineup)
-4. **Step 4: Confirm** — Summary with card type, team, player, minute (auto-filled, editable). "Save" and "Cancel".
-
-### Wizard UX Details
-- **Full-screen overlay** with dark background
-- **Back button** (top-left) to go to previous step
-- **Step indicator dots** at bottom (● ● ○)
-- **X button** (top-right) to cancel and dismiss
-- Tapping a card auto-advances to next step (no separate "Next" button)
-- Minute is auto-captured from the timer but editable on the confirm screen (for late entries)
+### Step View UX Details
+- Each step **replaces the entire view** (not an overlay/modal) — feels like navigating between pages
+- **Back arrow** (top-left) to go to previous step
+- **Step indicator** at top (e.g., "Step 1 of 3")
+- **No dropdowns anywhere** — all options are visible as tappable cards/list items
+- Tapping a card **auto-advances** to next step (no separate "Next" button)
+- Selecting a player on the final step **immediately saves** (no confirm screen). Minute is auto-captured from the timer.
+- For late/manual entries: accessible from the event timeline via an "Edit" action, where minute can be adjusted
 
 ### Timer Behavior
 - **Start Match** → sets `timerStartedAt = now`, status → FIRST_HALF
@@ -237,10 +258,12 @@ All player names, team names, and group names become clickable links throughout 
 ## 9. Component Summary
 
 ### New Components
-- `RefereeMatchView` — mobile-optimized main screen (full replacement of current `LiveControlPanel`; works on desktop too but optimized for touch)
-- `StepWizard` — full-screen overlay container with step management
-- `GoalWizard` — goal entry steps (team → player → confirm)
-- `CardWizard` — card entry steps (type → team → player → confirm)
+- `RefereeMatchView` — mobile-optimized main screen (full replacement of current `LiveControlPanel`; works on desktop too but optimized for touch). Manages view state: main → action choice → goal/card steps
+- `ActionChoiceView` — full-screen view with Goal (top) and Card (bottom) boxes
+- `GoalSteps` — goal entry step views (team → player → save)
+- `CardSteps` — card entry step views (type → team → player → save)
+- `TeamSelectView` — full-view team selection (two large cards)
+- `PlayerSelectView` — full-view scrollable player card list
 - `MatchTimer` — client-side timer display using timestamps
 - `EventTimeline` (referee) — editable timeline with delete/edit
 - `StatisticsPage` — competition-wide stats

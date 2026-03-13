@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import prisma from "@/lib/db"
 import { PublicLayout } from "@/components/layout/PublicLayout"
 import { TeamDetail } from "@/modules/teams/components/TeamDetail"
+import { getTeamStats } from "@/modules/statistics/queries"
 
 export const dynamic = 'force-dynamic'
 
@@ -76,6 +77,8 @@ export default async function TeamPage({ params }: TeamPageProps) {
     updatedAt: team.updatedAt,
   }
 
+  const teamStats = await getTeamStats(id)
+
   const matchData = matches
     .filter((m) => m.homeTeam && m.awayTeam)
     .map((m) => ({
@@ -95,7 +98,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
   return (
     <PublicLayout maxWidthClassName="max-w-6xl">
       <div>
-        <TeamDetail team={teamData} matches={matchData} />
+        <TeamDetail team={teamData} matches={matchData} stats={teamStats} />
       </div>
     </PublicLayout>
   )

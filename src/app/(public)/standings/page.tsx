@@ -52,6 +52,7 @@ export default async function StandingsPage() {
           {groupStandings.map(({ group, standings }) => (
             <StandingsTable
               key={group.id}
+              groupId={group.id}
               groupName={group.name}
               standings={standings}
             />

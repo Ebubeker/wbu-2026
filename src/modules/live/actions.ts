@@ -1,7 +1,7 @@
 'use server'
 
 import prisma from '@/lib/db'
-import { MatchStatus, CardType } from '@prisma/client'
+import { MatchStatus } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { goalSchema, cardSchema } from '@/lib/validations'
 import { broadcastToMatch } from './sse'
@@ -27,14 +27,12 @@ async function recalculateScores(matchId: string) {
     select: { teamId: true, isOwnGoal: true },
   })
 
-  // homeScore = goals scored by home team (not OG) + own goals by away team
   const homeScore = goals.filter(
     (g) =>
       (g.teamId === match.homeTeamId && !g.isOwnGoal) ||
       (g.teamId === match.awayTeamId && g.isOwnGoal)
   ).length
 
-  // awayScore = goals scored by away team (not OG) + own goals by home team
   const awayScore = goals.filter(
     (g) =>
       (g.teamId === match.awayTeamId && !g.isOwnGoal) ||
@@ -49,10 +47,29 @@ async function recalculateScores(matchId: string) {
   return { homeScore, awayScore }
 }
 
+function computeMatchMinute(match: {
+  status: string
+  timerStartedAt: Date | null
+  timerPausedAt: Date | null
+  pausedElapsed: number
+}): number {
+  const now = new Date()
+  let elapsed = 0
+
+  if (match.timerPausedAt && match.timerStartedAt) {
+    elapsed = match.timerPausedAt.getTime() - match.timerStartedAt.getTime() - match.pausedElapsed
+  } else if (match.timerStartedAt) {
+    elapsed = now.getTime() - match.timerStartedAt.getTime() - match.pausedElapsed
+  }
+
+  const minutes = Math.max(0, Math.min(30, Math.floor(elapsed / 60000)))
+  const isSecondHalf = match.status === 'SECOND_HALF'
+  return isSecondHalf ? minutes + 30 : minutes
+}
+
 export async function updateMatchStatus(
   matchId: string,
-  status: string,
-  matchMinute: number
+  status: string
 ) {
   // Auto-fill lineups when match starts
   if (status === 'FIRST_HALF') {
@@ -68,14 +85,44 @@ export async function updateMatchStatus(
     }
   }
 
+  // Determine timer fields based on status transition
+  const now = new Date()
+  const timerData: Record<string, unknown> = {}
+
+  if (status === 'FIRST_HALF' || status === 'SECOND_HALF') {
+    timerData.timerStartedAt = now
+    timerData.timerPausedAt = null
+    timerData.pausedElapsed = 0
+  } else if (status === 'HALF_TIME' || status === 'FULL_TIME') {
+    timerData.timerStartedAt = null
+    timerData.timerPausedAt = null
+    timerData.pausedElapsed = 0
+  }
+
+  // Compute matchMinute snapshot
+  let matchMinute = 0
+  if (status === 'FIRST_HALF') matchMinute = 0
+  else if (status === 'HALF_TIME') matchMinute = 30
+  else if (status === 'SECOND_HALF') matchMinute = 30
+  else if (status === 'FULL_TIME') matchMinute = 60
+
   const match = await prisma.match.update({
     where: { id: matchId },
-    data: { status: status as MatchStatus, matchMinute },
+    data: {
+      status: status as MatchStatus,
+      matchMinute,
+      ...timerData,
+    },
   })
 
   broadcastToMatch(matchId, {
     type: 'status_change',
-    data: { matchId, status, matchMinute },
+    data: {
+      matchId,
+      status,
+      matchMinute,
+      timerStartedAt: timerData.timerStartedAt ? (timerData.timerStartedAt as Date).toISOString() : null,
+    },
   })
 
   if (status === 'FULL_TIME') {
@@ -101,14 +148,86 @@ export async function updateMatchMinute(matchId: string, minute: number) {
   })
 }
 
+export async function pauseTimer(matchId: string) {
+  const match = await prisma.match.findUnique({
+    where: { id: matchId },
+    select: { timerPausedAt: true, timerStartedAt: true, status: true, pausedElapsed: true },
+  })
+
+  if (!match || match.timerPausedAt) return // idempotent
+
+  const now = new Date()
+  const minute = computeMatchMinute({ ...match, timerPausedAt: now })
+
+  await prisma.match.update({
+    where: { id: matchId },
+    data: { timerPausedAt: now, matchMinute: minute },
+  })
+
+  broadcastToMatch(matchId, {
+    type: 'timer_pause',
+    data: { matchId, timerPausedAt: now.toISOString(), matchMinute: minute },
+  })
+}
+
+export async function resumeTimer(matchId: string) {
+  const match = await prisma.match.findUnique({
+    where: { id: matchId },
+    select: { timerPausedAt: true, timerStartedAt: true, pausedElapsed: true },
+  })
+
+  if (!match || !match.timerPausedAt) return // idempotent
+
+  const additionalPause = new Date().getTime() - match.timerPausedAt.getTime()
+  const newPausedElapsed = match.pausedElapsed + additionalPause
+
+  await prisma.match.update({
+    where: { id: matchId },
+    data: { timerPausedAt: null, pausedElapsed: newPausedElapsed },
+  })
+
+  broadcastToMatch(matchId, {
+    type: 'timer_resume',
+    data: { matchId, pausedElapsed: newPausedElapsed },
+  })
+}
+
+export async function getTimerState(matchId: string) {
+  const match = await prisma.match.findUnique({
+    where: { id: matchId },
+    select: {
+      status: true,
+      matchMinute: true,
+      timerStartedAt: true,
+      timerPausedAt: true,
+      pausedElapsed: true,
+    },
+  })
+
+  if (!match) throw new Error('Match not found')
+  return match
+}
+
 export async function addGoal(data: {
   matchId: string
   teamId: string
   playerId: string
-  minute: number
+  minute?: number
   isOwnGoal: boolean
 }) {
-  const parsed = goalSchema.parse(data)
+  // Auto-compute minute from timer if not provided
+  let minute = data.minute
+  if (!minute) {
+    const match = await prisma.match.findUnique({
+      where: { id: data.matchId },
+      select: { status: true, timerStartedAt: true, timerPausedAt: true, pausedElapsed: true },
+    })
+    if (match) {
+      minute = computeMatchMinute(match)
+    }
+  }
+
+  const parsed = goalSchema.parse({ ...data, minute: minute ?? 0 })
 
   const result = await prisma.$transaction(async (tx) => {
     const goal = await tx.goal.create({
@@ -237,9 +356,20 @@ export async function addCard(data: {
   teamId: string
   playerId: string
   type: 'YELLOW' | 'RED'
-  minute: number
+  minute?: number
 }) {
-  const parsed = cardSchema.parse(data)
+  let minute = data.minute
+  if (!minute) {
+    const match = await prisma.match.findUnique({
+      where: { id: data.matchId },
+      select: { status: true, timerStartedAt: true, timerPausedAt: true, pausedElapsed: true },
+    })
+    if (match) {
+      minute = computeMatchMinute(match)
+    }
+  }
+
+  const parsed = cardSchema.parse({ ...data, minute: minute ?? 0 })
 
   const card = await prisma.card.create({
     data: {

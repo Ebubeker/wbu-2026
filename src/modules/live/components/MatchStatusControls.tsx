@@ -22,10 +22,10 @@ export function MatchStatusControls({
   const [confirmFullTime, setConfirmFullTime] = useState(false)
   const [confirmReopen, setConfirmReopen] = useState(false)
 
-  async function handleStatusChange(newStatus: string, minute: number) {
+  async function handleStatusChange(newStatus: string) {
     setLoading(true)
     try {
-      await updateMatchStatus(matchId, newStatus, minute)
+      await updateMatchStatus(matchId, newStatus)
       toast.success(`Match status updated to ${newStatus.replace('_', ' ')}`)
       onStatusChange?.(newStatus)
     } catch (error) {
@@ -42,7 +42,7 @@ export function MatchStatusControls({
       {status === 'SCHEDULED' && (
         <Button
           className="w-full h-14 bg-green-600 hover:bg-green-700 text-white text-lg"
-          onClick={() => handleStatusChange('FIRST_HALF', 1)}
+          onClick={() => handleStatusChange('FIRST_HALF')}
           disabled={loading}
         >
           <Play className="h-5 w-5 mr-2" />
@@ -53,7 +53,7 @@ export function MatchStatusControls({
       {status === 'FIRST_HALF' && (
         <Button
           className="w-full h-14 bg-yellow-500 hover:bg-yellow-600 text-black text-lg"
-          onClick={() => handleStatusChange('HALF_TIME', 45)}
+          onClick={() => handleStatusChange('HALF_TIME')}
           disabled={loading}
         >
           <Pause className="h-5 w-5 mr-2" />
@@ -64,7 +64,7 @@ export function MatchStatusControls({
       {status === 'HALF_TIME' && (
         <Button
           className="w-full h-14 bg-green-600 hover:bg-green-700 text-white text-lg"
-          onClick={() => handleStatusChange('SECOND_HALF', 46)}
+          onClick={() => handleStatusChange('SECOND_HALF')}
           disabled={loading}
         >
           <Play className="h-5 w-5 mr-2" />
@@ -92,7 +92,7 @@ export function MatchStatusControls({
             variant="destructive"
             onConfirm={() => {
               setConfirmFullTime(false)
-              handleStatusChange('FULL_TIME', 90)
+              handleStatusChange('FULL_TIME')
             }}
           />
         </>
@@ -124,7 +124,7 @@ export function MatchStatusControls({
             variant="default"
             onConfirm={() => {
               setConfirmReopen(false)
-              handleStatusChange('SECOND_HALF', 90)
+              handleStatusChange('SECOND_HALF')
             }}
           />
         </div>

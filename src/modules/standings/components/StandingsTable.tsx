@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 import type { StandingsRow } from '../types'
 
 interface StandingsTableProps {
+  groupId?: string
   groupName: string
   standings: StandingsRow[]
   qualifyCount?: number
@@ -63,6 +64,7 @@ function StatPill({
 }
 
 export function StandingsTable({
+  groupId,
   groupName,
   standings,
   qualifyCount = 2,
@@ -86,7 +88,13 @@ export function StandingsTable({
             <p className="text-xs uppercase tracking-[0.28em] text-primary/75">
               Group Table
             </p>
-            <h3 className="mt-2 text-2xl font-semibold text-foreground">{groupName}</h3>
+            {groupId ? (
+              <Link href={`/groups/${groupId}`}>
+                <h3 className="mt-2 text-2xl font-semibold text-foreground hover:underline">{groupName}</h3>
+              </Link>
+            ) : (
+              <h3 className="mt-2 text-2xl font-semibold text-foreground">{groupName}</h3>
+            )}
           </div>
           <Badge variant="secondary">Top {qualifyCount} advance</Badge>
         </div>
