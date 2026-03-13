@@ -5,7 +5,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout"
 import { TeamGrid } from "@/modules/teams/components/TeamGrid"
 import { EmptyState } from "@/components/common/EmptyState"
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 export default async function TeamsPage() {
   const teams = await prisma.team.findMany({

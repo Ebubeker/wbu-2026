@@ -46,22 +46,6 @@ function TeamIdentity({ row }: { row: StandingsRow }) {
   )
 }
 
-function StatPill({
-  label,
-  value,
-}: {
-  label: string
-  value: number | string
-}) {
-  return (
-    <div className="rounded-[14px] border border-white/10 bg-background px-3 py-2 text-center">
-      <p className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
-        {label}
-      </p>
-      <p className="mt-1 text-base font-semibold text-foreground">{value}</p>
-    </div>
-  )
-}
 
 export function StandingsTable({
   groupId,
@@ -99,60 +83,62 @@ export function StandingsTable({
           <Badge variant="secondary">Top {qualifyCount} advance</Badge>
         </div>
 
-        <div className="space-y-3 p-4 md:hidden">
-          {standings.map((row) => {
-            const isQualifying = row.position <= qualifyCount
-
-            return (
-              <div
-                key={row.team.id}
-                className={cn(
-                  'rounded-[18px] border border-white/10 bg-background p-4',
-                  isQualifying && 'border-emerald-400/20 bg-emerald-500/10'
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      'flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] border text-sm font-semibold',
-                      isQualifying
-                        ? 'border-emerald-300/30 bg-emerald-400/15 text-emerald-50'
-                        : 'border-white/10 bg-background text-foreground'
-                    )}
-                  >
-                    {row.position}
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <TeamIdentity row={row} />
-                  </div>
-
-                  <div className="text-right">
-                    <p className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
-                      Pts
-                    </p>
-                    <p className="text-3xl font-bold text-foreground">{row.points}</p>
-                  </div>
-                </div>
-
-                <div className="mt-4 grid grid-cols-4 gap-2">
-                  <StatPill label="P" value={row.played} />
-                  <StatPill label="W" value={row.won} />
-                  <StatPill label="D" value={row.drawn} />
-                  <StatPill label="L" value={row.lost} />
-                </div>
-
-                <div className="mt-2 grid grid-cols-3 gap-2">
-                  <StatPill label="GF" value={row.goalsFor} />
-                  <StatPill label="GA" value={row.goalsAgainst} />
-                  <StatPill
-                    label="GD"
-                    value={row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
-                  />
-                </div>
-              </div>
-            )
-          })}
+        <div className="p-3 md:hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10 text-xs text-muted-foreground">
+                  <th className="pb-2 pl-2 pr-1 text-center w-7">#</th>
+                  <th className="pb-2 px-1 text-left">Team</th>
+                  <th className="pb-2 px-1 text-center w-7">P</th>
+                  <th className="pb-2 px-1 text-center w-7">W</th>
+                  <th className="pb-2 px-1 text-center w-7">D</th>
+                  <th className="pb-2 px-1 text-center w-7">L</th>
+                  <th className="pb-2 px-1 text-center w-8">GD</th>
+                  <th className="pb-2 pl-1 pr-2 text-center w-8 font-bold">Pts</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {standings.map((row) => {
+                  const isQualifying = row.position <= qualifyCount
+                  return (
+                    <tr key={row.team.id} className={cn(isQualifying && 'bg-emerald-500/10')}>
+                      <td className="py-2.5 pl-2 pr-1 text-center">
+                        <span className={cn(
+                          'inline-flex h-6 w-6 items-center justify-center rounded-md text-xs font-semibold',
+                          isQualifying
+                            ? 'bg-emerald-400/15 text-emerald-300'
+                            : 'text-muted-foreground'
+                        )}>
+                          {row.position}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-1">
+                        <Link href={`/teams/${row.team.id}`} className="flex items-center gap-2 hover:underline">
+                          {row.team.logo ? (
+                            <img src={row.team.logo} alt={row.team.name} className="h-6 w-6 rounded-md object-cover" />
+                          ) : (
+                            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-muted text-[9px] font-bold">
+                              {row.team.shortName}
+                            </div>
+                          )}
+                          <span className="truncate font-medium text-foreground text-xs">{row.team.shortName}</span>
+                        </Link>
+                      </td>
+                      <td className="py-2.5 px-1 text-center text-xs text-muted-foreground">{row.played}</td>
+                      <td className="py-2.5 px-1 text-center text-xs text-muted-foreground">{row.won}</td>
+                      <td className="py-2.5 px-1 text-center text-xs text-muted-foreground">{row.drawn}</td>
+                      <td className="py-2.5 px-1 text-center text-xs text-muted-foreground">{row.lost}</td>
+                      <td className="py-2.5 px-1 text-center text-xs text-muted-foreground">
+                        {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
+                      </td>
+                      <td className="py-2.5 pl-1 pr-2 text-center text-sm font-bold text-foreground">{row.points}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div className="hidden p-4 md:block">

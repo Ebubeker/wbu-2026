@@ -11,6 +11,7 @@ import { SSE_RETRY_INTERVAL } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import { LineupDisplay } from '@/modules/lineups/components/LineupDisplay'
 import { VotePanel } from '@/modules/voting/components/VotePanel'
+import { LiveMinute } from './LiveMinute'
 import type { MatchWithEvents } from '../types'
 
 interface MatchDetailProps {
@@ -144,8 +145,15 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
           ...previous,
           status: data.status,
           matchMinute: data.matchMinute,
+          timerStartedAt: data.timerStartedAt ?? previous.timerStartedAt,
+          timerPausedAt: data.timerPausedAt ?? previous.timerPausedAt,
+          pausedElapsed: data.pausedElapsed ?? previous.pausedElapsed,
         }))
       })
+
+      eventSource.addEventListener('timer_start', refreshMatch)
+      eventSource.addEventListener('timer_pause', refreshMatch)
+      eventSource.addEventListener('timer_resume', refreshMatch)
 
       eventSource.addEventListener('goal_added', (event) => {
         const data = JSON.parse(event.data)
@@ -231,7 +239,14 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
                     {isLive && (
                       <div className="mt-3 flex items-center justify-center gap-2 text-sm font-medium text-rose-100">
                         <Radio className="h-4 w-4 text-rose-300" />
-                        <span>{formatMatchMinute(match.matchMinute)}</span>
+                        <span>
+                          <LiveMinute
+                            status={match.status}
+                            timerStartedAt={match.timerStartedAt}
+                            timerPausedAt={match.timerPausedAt}
+                            pausedElapsed={match.pausedElapsed}
+                          />
+                        </span>
                       </div>
                     )}
 

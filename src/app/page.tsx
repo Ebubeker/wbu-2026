@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { EmptyState } from "@/components/common/EmptyState"
 import type { MatchData } from "@/modules/matches/types"
 
-export const revalidate = 30
+export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   const [competition, liveMatches, upcomingMatches, recentResults] =

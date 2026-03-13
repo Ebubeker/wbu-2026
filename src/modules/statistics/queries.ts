@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import prisma from '@/lib/db'
 import { POINTS_WIN, POINTS_DRAW } from '@/lib/constants'
 import type {
@@ -11,7 +12,9 @@ import type {
   TeamStats,
 } from './types'
 
-export async function getCompetitionStats(): Promise<CompetitionStats> {
+const CACHE_TTL = 30 // seconds
+
+async function _getCompetitionStats(): Promise<CompetitionStats> {
   const [totalMatches, completedMatches, totalGoals, cards] = await Promise.all([
     prisma.match.count(),
     prisma.match.count({ where: { status: 'FULL_TIME' } }),
@@ -37,7 +40,13 @@ export async function getCompetitionStats(): Promise<CompetitionStats> {
   }
 }
 
-export async function getTopScorers(limit = 10): Promise<TopScorer[]> {
+export const getCompetitionStats = unstable_cache(
+  _getCompetitionStats,
+  ['competition-stats'],
+  { revalidate: CACHE_TTL }
+)
+
+async function _getTopScorers(limit = 10): Promise<TopScorer[]> {
   const scorers = await prisma.goal.groupBy({
     by: ['playerId'],
     where: { isOwnGoal: false },
@@ -80,7 +89,14 @@ export async function getTopScorers(limit = 10): Promise<TopScorer[]> {
     .filter((s): s is TopScorer => s !== null)
 }
 
-export async function getMostCardedPlayers(limit = 10): Promise<MostCardedPlayer[]> {
+export const getTopScorers = (limit = 10) =>
+  unstable_cache(
+    () => _getTopScorers(limit),
+    [`top-scorers-${limit}`],
+    { revalidate: CACHE_TTL }
+  )()
+
+async function _getMostCardedPlayers(limit = 10): Promise<MostCardedPlayer[]> {
   const carded = await prisma.card.groupBy({
     by: ['playerId', 'type'],
     _count: { id: true },
@@ -138,7 +154,14 @@ export async function getMostCardedPlayers(limit = 10): Promise<MostCardedPlayer
     .filter((s): s is MostCardedPlayer => s !== null)
 }
 
-export async function getTeamRankings(): Promise<TeamRanking[]> {
+export const getMostCardedPlayers = (limit = 10) =>
+  unstable_cache(
+    () => _getMostCardedPlayers(limit),
+    [`most-carded-${limit}`],
+    { revalidate: CACHE_TTL }
+  )()
+
+async function _getTeamRankings(): Promise<TeamRanking[]> {
   const teams = await prisma.team.findMany({
     select: { id: true, name: true, shortName: true, logo: true },
   })
@@ -200,7 +223,13 @@ export async function getTeamRankings(): Promise<TeamRanking[]> {
   })
 }
 
-export async function getMatchRecords(): Promise<{
+export const getTeamRankings = unstable_cache(
+  _getTeamRankings,
+  ['team-rankings'],
+  { revalidate: CACHE_TTL }
+)
+
+async function _getMatchRecords(): Promise<{
   biggestWin: MatchRecord | null
   highestScoring: MatchRecord | null
 }> {
@@ -257,6 +286,12 @@ export async function getMatchRecords(): Promise<{
 
   return { biggestWin, highestScoring }
 }
+
+export const getMatchRecords = unstable_cache(
+  _getMatchRecords,
+  ['match-records'],
+  { revalidate: CACHE_TTL }
+)
 
 export async function getPlayerStats(playerId: string): Promise<PlayerStats> {
   const [goals, cards, lineupEntries] = await Promise.all([

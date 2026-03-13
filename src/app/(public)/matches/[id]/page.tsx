@@ -4,7 +4,7 @@ import prisma from "@/lib/db"
 import { PublicLayout } from "@/components/layout/PublicLayout"
 import { MatchDetail } from "@/modules/matches/components/MatchDetail"
 
-export const revalidate = 30
+export const dynamic = 'force-dynamic'
 
 interface MatchPageProps {
   params: Promise<{ id: string }>

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Clock3, MapPin, Radio } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { LiveMinute } from './LiveMinute'
 import type { MatchData } from '../types'
 
 interface MatchCardProps {
@@ -77,7 +78,12 @@ export function MatchCard({ match, linkPrefix = '/matches' }: MatchCardProps) {
           {isLive ? (
             <Badge className="border-red-200 bg-red-50 text-red-600">
               <Radio className="mr-1 h-3 w-3" />
-              {match.matchMinute}&apos;
+              <LiveMinute
+                status={match.status}
+                timerStartedAt={match.timerStartedAt}
+                timerPausedAt={match.timerPausedAt}
+                pausedElapsed={match.pausedElapsed}
+              />
             </Badge>
           ) : (
             <Badge variant="outline">

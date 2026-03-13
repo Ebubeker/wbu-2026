@@ -9,7 +9,7 @@ import { calculateStandings } from '@/modules/standings/utils'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { getGroupStats } from '@/modules/statistics/queries'
 
-export const revalidate = 30
+export const dynamic = 'force-dynamic'
 
 interface GroupPageProps {
   params: Promise<{ id: string }>

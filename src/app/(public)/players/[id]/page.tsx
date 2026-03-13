@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { getPlayerStats } from '@/modules/statistics/queries'
 
-export const revalidate = 30
+export const dynamic = 'force-dynamic'
 
 interface PlayerPageProps {
   params: Promise<{ id: string }>

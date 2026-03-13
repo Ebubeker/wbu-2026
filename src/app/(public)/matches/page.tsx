@@ -3,7 +3,7 @@ import { PageHeader } from "@/components/common/PageHeader"
 import { PublicLayout } from "@/components/layout/PublicLayout"
 import { MatchSchedule } from "@/modules/matches/components/MatchSchedule"
 
-export const revalidate = 30
+export const dynamic = 'force-dynamic'
 
 export default async function MatchesPage() {
   const [matches, groups] = await Promise.all([
