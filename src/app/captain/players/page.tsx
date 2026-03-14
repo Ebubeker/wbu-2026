@@ -5,11 +5,11 @@ import useSWR from "swr"
 import { toast } from "sonner"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { PageHeader } from "@/components/common/PageHeader"
 import { LoadingSpinner } from "@/components/common/LoadingSpinner"
 import { EmptyState } from "@/components/common/EmptyState"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Camera, Users } from "lucide-react"
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
@@ -20,13 +20,6 @@ interface Player {
   number: number
   position: string
   photo: string | null
-}
-
-const positionColors: Record<string, string> = {
-  GK: "bg-amber-100 text-amber-800",
-  DEF: "bg-blue-100 text-blue-800",
-  MID: "bg-green-100 text-green-800",
-  FWD: "bg-red-100 text-red-800",
 }
 
 export default function CaptainPlayersPage() {
@@ -78,6 +71,24 @@ export default function CaptainPlayersPage() {
     }
   }
 
+  const handlePositionChange = async (playerId: string, playerName: string, position: string) => {
+    try {
+      const res = await fetch(`/api/players/${playerId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ position }),
+      })
+      if (res.ok) {
+        toast.success(`${playerName} moved to ${position}`)
+        mutate()
+      } else {
+        toast.error("Failed to update position")
+      }
+    } catch {
+      toast.error("Something went wrong")
+    }
+  }
+
   if (!players)
     return (
       <div className="flex justify-center py-12">
@@ -88,18 +99,9 @@ export default function CaptainPlayersPage() {
   return (
     <div className="max-w-3xl">
       <PageHeader
-        title="Player Photos"
-        description="Upload or change photos for your team's players"
+        title="Players"
+        description="Manage photos and positions for your team's players"
       />
-
-      <Card className="mt-6 mb-6">
-        <CardContent className="pt-4">
-          <p className="text-sm text-muted-foreground">
-            You can upload or change player photos. To change player names,
-            numbers, or positions, please contact the tournament admin.
-          </p>
-        </CardContent>
-      </Card>
 
       {players.length === 0 ? (
         <EmptyState
@@ -127,12 +129,20 @@ export default function CaptainPlayersPage() {
                     <span className="text-sm text-muted-foreground">
                       #{player.number}
                     </span>
-                    <Badge
-                      variant="outline"
-                      className={positionColors[player.position] || ""}
+                    <Select
+                      value={player.position}
+                      onValueChange={(val) => handlePositionChange(player.id, player.name, val)}
                     >
-                      {player.position}
-                    </Badge>
+                      <SelectTrigger className="h-7 w-20 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="GK">GK</SelectItem>
+                        <SelectItem value="DEF">DEF</SelectItem>
+                        <SelectItem value="MID">MID</SelectItem>
+                        <SelectItem value="FWD">FWD</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 

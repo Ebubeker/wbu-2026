@@ -53,9 +53,19 @@ export async function PUT(
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
       }
 
+      const captainData: Record<string, unknown> = {}
+      if (body.photo !== undefined) captainData.photo = body.photo
+      if (body.position !== undefined) {
+        const validPositions = ['GK', 'DEF', 'MID', 'FWD']
+        if (!validPositions.includes(body.position)) {
+          return NextResponse.json({ error: "Invalid position" }, { status: 400 })
+        }
+        captainData.position = body.position
+      }
+
       const updated = await prisma.player.update({
         where: { id },
-        data: { photo: body.photo },
+        data: captainData,
         include: { team: true },
       })
 
