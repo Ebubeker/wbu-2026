@@ -111,7 +111,7 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
     if (!isLive) return
 
     let eventSource: EventSource | null = null
-    let pollInterval: ReturnType<typeof setInterval> | null = null
+    let fallbackPollInterval: ReturnType<typeof setInterval> | null = null
 
     async function refreshMatch() {
       try {
@@ -124,6 +124,9 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
         // Ignore and retry on next reconnect or poll.
       }
     }
+
+    // Always poll every 60s to keep timeline, scores, etc. fresh
+    const periodicRefresh = setInterval(refreshMatch, 60_000)
 
     function connectSSE() {
       eventSource = new EventSource(`/api/matches/${match.id}/live-stream`)
@@ -188,8 +191,9 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
         eventSource?.close()
         eventSource = null
 
-        if (!pollInterval) {
-          pollInterval = setInterval(refreshMatch, SSE_RETRY_INTERVAL)
+        // Faster fallback polling when SSE drops
+        if (!fallbackPollInterval) {
+          fallbackPollInterval = setInterval(refreshMatch, SSE_RETRY_INTERVAL)
         }
       }
     }
@@ -198,7 +202,8 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
 
     return () => {
       eventSource?.close()
-      if (pollInterval) clearInterval(pollInterval)
+      clearInterval(periodicRefresh)
+      if (fallbackPollInterval) clearInterval(fallbackPollInterval)
     }
   }, [match.id, isLive])
 
