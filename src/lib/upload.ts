@@ -1,7 +1,7 @@
-import fs from 'fs/promises'
-import path from 'path'
-import { v4 as uuidv4 } from 'uuid'
 import { ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE } from '@/lib/constants'
+
+const UPLOAD_API_URL = process.env.UPLOAD_API_URL // e.g. http://your-vps-ip/api/upload
+const UPLOAD_SECRET = process.env.UPLOAD_SECRET
 
 export function validateFile(file: File): { valid: boolean; error?: string } {
   if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
@@ -25,26 +25,31 @@ export async function saveFile(
   file: File,
   directory: 'teams' | 'players'
 ): Promise<string> {
-  const ext = path.extname(file.name) || '.jpg'
-  const filename = `${uuidv4()}${ext}`
-  const uploadDir = path.join(process.cwd(), 'public', 'uploads', directory)
+  if (!UPLOAD_API_URL || !UPLOAD_SECRET) {
+    throw new Error('Upload server not configured. Set UPLOAD_API_URL and UPLOAD_SECRET env vars.')
+  }
 
-  await fs.mkdir(uploadDir, { recursive: true })
+  const formData = new FormData()
+  formData.append('file', file)
 
-  const filePath = path.join(uploadDir, filename)
-  const buffer = Buffer.from(await file.arrayBuffer())
-  await fs.writeFile(filePath, buffer)
+  const res = await fetch(`${UPLOAD_API_URL}?directory=${directory}`, {
+    method: 'POST',
+    headers: { 'x-upload-secret': UPLOAD_SECRET },
+    body: formData,
+  })
 
-  return `/uploads/${directory}/${filename}`
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || 'Upload failed')
+  }
+
+  const { url } = await res.json()
+
+  // Return full public URL so images are served from the VPS
+  const baseUrl = process.env.UPLOAD_PUBLIC_URL // e.g. http://your-vps-ip
+  return baseUrl ? `${baseUrl}${url}` : url
 }
 
-export async function deleteFile(filePath: string): Promise<void> {
-  const fullPath = path.join(process.cwd(), 'public', filePath)
-
-  try {
-    await fs.access(fullPath)
-    await fs.unlink(fullPath)
-  } catch {
-    // File does not exist or cannot be accessed; silently ignore
-  }
+export async function deleteFile(_filePath: string): Promise<void> {
+  // Files are now on the VPS; deletion can be handled there if needed
 }
