@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { ClientDateTime } from "@/components/common/ClientDateTime"
 import {
   Users,
   UserCheck,
@@ -233,11 +234,7 @@ export default async function AdminDashboard() {
                         </div>
                         <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                           {match.group && <Badge variant="outline" className="text-[10px] px-1.5 py-0">{match.group.name}</Badge>}
-                          <span>
-                            {new Date(match.matchDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                            {' '}
-                            {new Date(match.matchDate).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                          </span>
+                          <ClientDateTime date={match.matchDate} />
                         </div>
                       </div>
                       <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
