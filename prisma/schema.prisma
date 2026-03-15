@@ -114,6 +114,7 @@ model Player {
   goals         Goal[]
   cards         Card[]
   lineupEntries LineupPlayer[]
+  motmVotes     MotmVote[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
@@ -154,6 +155,7 @@ model Match {
   cards           Card[]
   lineups         Lineup[]
   votes           MatchVote[]
+  motmVotes       MotmVote[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -254,4 +256,18 @@ model MatchVote {
 
   @@unique([matchId, deviceFingerprint])
   @@index([matchId])
+}
+
+model MotmVote {
+  id                String   @id @default(uuid())
+  match             Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId           String
+  player            Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId          String
+  deviceFingerprint String
+  createdAt         DateTime @default(now())
+
+  @@unique([matchId, deviceFingerprint])
+  @@index([matchId])
+  @@index([playerId])
 }

@@ -12,9 +12,15 @@ interface VotePanelProps {
   homeTeamName: string
   awayTeamName: string
   isFinished: boolean
+  homeScore?: number
+  awayScore?: number
 }
 
-export function VotePanel({ matchId, homeTeamName, awayTeamName, isFinished }: VotePanelProps) {
+export function VotePanel({ matchId, homeTeamName, awayTeamName, isFinished, homeScore, awayScore }: VotePanelProps) {
+  // Determine which prediction was correct
+  const winningVote: 'HOME' | 'DRAW' | 'AWAY' | null = isFinished && homeScore != null && awayScore != null
+    ? homeScore > awayScore ? 'HOME' : awayScore > homeScore ? 'AWAY' : 'DRAW'
+    : null
   const [counts, setCounts] = useState<VoteCounts | null>(null)
   const [fingerprint, setFingerprint] = useState<string | null>(null)
   const [voting, setVoting] = useState(false)
@@ -113,27 +119,43 @@ export function VotePanel({ matchId, homeTeamName, awayTeamName, isFinished }: V
               { label: homeTeamName, count: counts.home, vote: 'HOME' as const },
               { label: 'Draw', count: counts.draw, vote: 'DRAW' as const },
               { label: awayTeamName, count: counts.away, vote: 'AWAY' as const },
-            ].map((item) => (
-              <div key={item.vote}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className={counts.userVote === item.vote ? 'font-semibold text-primary' : ''}>
-                    {item.label}
-                  </span>
-                  <span className="text-muted-foreground">{pct(item.count)}%</span>
+            ].map((item) => {
+              const isCorrect = winningVote === item.vote
+              const isUserPick = counts.userVote === item.vote
+              return (
+                <div key={item.vote}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className={
+                      isCorrect
+                        ? 'font-bold text-amber-600'
+                        : isUserPick
+                          ? 'font-semibold text-primary'
+                          : ''
+                    }>
+                      {isCorrect && '🏆 '}{item.label}
+                    </span>
+                    <span className={isCorrect ? 'font-bold text-amber-600' : 'text-muted-foreground'}>
+                      {pct(item.count)}%
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        isCorrect
+                          ? 'bg-gradient-to-r from-amber-400 to-amber-500'
+                          : isUserPick
+                            ? 'bg-primary'
+                            : 'bg-muted-foreground/40'
+                      }`}
+                      style={{ width: `${pct(item.count)}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all ${
-                      counts.userVote === item.vote ? 'bg-primary' : 'bg-muted-foreground/40'
-                    }`}
-                    style={{ width: `${pct(item.count)}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              )
+            })}
             <p className="text-xs text-muted-foreground text-center">
               {total} vote{total !== 1 ? 's' : ''}
-              {hasVoted && ' \u2014 your vote is in!'}
+              {hasVoted && ' — your vote is in!'}
             </p>
           </div>
         ) : null}

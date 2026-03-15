@@ -11,6 +11,7 @@ import { SSE_RETRY_INTERVAL } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import { LineupDisplay } from '@/modules/lineups/components/LineupDisplay'
 import { VotePanel } from '@/modules/voting/components/VotePanel'
+import { MotmPanel } from '@/modules/voting/components/MotmPanel'
 import { LiveMinute } from './LiveMinute'
 import type { MatchWithEvents } from '../types'
 
@@ -376,12 +377,38 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
 
       {/* Fan voting */}
       {match.homeTeam && match.awayTeam && (
-        <VotePanel
-          matchId={match.id}
-          homeTeamName={match.homeTeam.name}
-          awayTeamName={match.awayTeam.name}
-          isFinished={match.status === 'FULL_TIME'}
-        />
+        <>
+          <VotePanel
+            matchId={match.id}
+            homeTeamName={match.homeTeam.name}
+            awayTeamName={match.awayTeam.name}
+            isFinished={match.status === 'FULL_TIME'}
+            homeScore={match.homeScore}
+            awayScore={match.awayScore}
+          />
+
+          {isFullTime && (
+            <MotmPanel
+              matchId={match.id}
+              players={[
+                ...match.homeTeam.players.map((p) => ({
+                  id: p.id,
+                  name: p.name,
+                  number: p.number,
+                  teamName: match.homeTeam!.name,
+                  teamId: match.homeTeam!.id,
+                })),
+                ...match.awayTeam.players.map((p) => ({
+                  id: p.id,
+                  name: p.name,
+                  number: p.number,
+                  teamName: match.awayTeam!.name,
+                  teamId: match.awayTeam!.id,
+                })),
+              ]}
+            />
+          )}
+        </>
       )}
 
       {(match.homeTeam || match.awayTeam) && (
