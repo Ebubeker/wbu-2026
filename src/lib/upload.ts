@@ -45,9 +45,11 @@ export async function saveFile(
 
   const { url } = await res.json()
 
-  // Return full public URL so images are served from the VPS
-  const baseUrl = process.env.UPLOAD_PUBLIC_URL // e.g. http://your-vps-ip
-  return baseUrl ? `${baseUrl}${url}` : url
+  // Build the full VPS URL and return a proxy path so images are served
+  // through the Next.js app (avoids mixed-content HTTP/HTTPS issues)
+  const baseUrl = process.env.UPLOAD_PUBLIC_URL
+  const fullUrl = baseUrl ? `${baseUrl}${url}` : url
+  return `/api/proxy-image?url=${encodeURIComponent(fullUrl)}`
 }
 
 export async function deleteFile(_filePath: string): Promise<void> {
