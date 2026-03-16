@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/image'
+
 import { ArrowUpRight, Shield } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import type { TeamData } from '../types'
@@ -17,11 +17,10 @@ export function TeamCard({ team }: TeamCardProps) {
           <div className="flex items-center gap-3 sm:hidden">
             <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-border/60 bg-muted/30 p-1.5">
               {team.logo ? (
-                <Image
+                <img
                   src={team.logo}
                   alt={team.name}
-                  fill
-                  className="object-contain p-1.5"
+                  className="absolute inset-0 h-full w-full object-contain p-1.5"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
@@ -60,11 +59,10 @@ export function TeamCard({ team }: TeamCardProps) {
             <div className="mt-6 flex flex-1 flex-col items-center text-center">
               <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-border/60 bg-muted/30 p-2">
                 {team.logo ? (
-                  <Image
+                  <img
                     src={team.logo}
                     alt={team.name}
-                    fill
-                    className="object-contain p-2"
+                    className="absolute inset-0 h-full w-full object-contain p-2"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">

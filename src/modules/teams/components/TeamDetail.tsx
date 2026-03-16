@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/image'
+
 import { Shield, Trophy, Users, Shirt } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { PlayerCard } from '@/modules/players/components/PlayerCard'
@@ -86,11 +86,10 @@ export function TeamDetail({ team, matches, stats: teamStats }: TeamDetailProps)
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
             <div className="relative h-24 w-24 overflow-hidden rounded-[20px] border border-white/10 bg-background p-3">
               {team.logo ? (
-                <Image
+                <img
                   src={team.logo}
                   alt={team.name}
-                  fill
-                  className="object-contain p-3"
+                  className="absolute inset-0 h-full w-full object-contain p-3"
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center">

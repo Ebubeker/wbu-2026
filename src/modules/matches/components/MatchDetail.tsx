@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
+
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { StatusBadge } from '@/components/common/StatusBadge'
@@ -56,11 +56,10 @@ function TeamPanel({
     <div className="flex flex-col items-center gap-2 text-center sm:gap-3">
       <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-border/60 bg-muted/30 p-2.5 sm:h-24 sm:w-24 sm:rounded-[20px] sm:p-3">
         {logo ? (
-          <Image
+          <img
             src={logo}
             alt={name}
-            fill
-            className="object-contain p-2.5 sm:p-3"
+            className="absolute inset-0 h-full w-full object-contain p-2.5 sm:p-3"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-base font-semibold text-foreground sm:text-lg">

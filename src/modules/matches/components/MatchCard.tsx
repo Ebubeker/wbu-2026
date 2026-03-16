@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
+
 import { Clock3, MapPin, Radio } from 'lucide-react'
 import { LiveMinute } from './LiveMinute'
 import type { MatchData } from '../types'
@@ -40,11 +40,10 @@ function TeamMark({
     <div className={`flex items-center gap-3 ${isRight ? 'flex-row-reverse text-right' : ''}`}>
       <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg border border-border bg-secondary p-1">
         {team.logo ? (
-          <Image
+          <img
             src={team.logo}
             alt={team.name}
-            fill
-            className="object-contain p-1"
+            className="absolute inset-0 h-full w-full object-contain p-1"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-[10px] font-semibold text-foreground">

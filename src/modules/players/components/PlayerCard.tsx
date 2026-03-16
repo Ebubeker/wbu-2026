@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import type { PlayerData } from '../types'
 
@@ -21,11 +20,10 @@ export function PlayerCard({ player }: PlayerCardProps) {
       <CardContent className="flex flex-col items-center gap-2 p-3 sm:gap-3 sm:p-4">
         <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-border/60 bg-muted/30 p-1.5 sm:h-16 sm:w-16 sm:rounded-[14px] sm:p-2">
           {player.photo ? (
-            <Image
+            <img
               src={player.photo}
               alt={player.name}
-              fill
-              className="object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           ) : (
             <span className="text-lg font-bold text-foreground sm:text-xl">

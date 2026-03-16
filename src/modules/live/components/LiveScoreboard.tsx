@@ -1,4 +1,4 @@
-import Image from 'next/image'
+
 import { StatusBadge } from '@/components/common/StatusBadge'
 
 interface LiveScoreboardProps {
@@ -27,11 +27,10 @@ export function LiveScoreboard({
         <div className="flex flex-col items-center gap-1 flex-1">
           <div className="relative h-14 w-14">
             {homeTeam.logo ? (
-              <Image
+              <img
                 src={homeTeam.logo}
                 alt={homeTeam.name}
-                fill
-                className="object-contain"
+                className="absolute inset-0 h-full w-full object-contain"
               />
             ) : (
               <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center text-sm font-bold">
@@ -66,11 +65,10 @@ export function LiveScoreboard({
         <div className="flex flex-col items-center gap-1 flex-1">
           <div className="relative h-14 w-14">
             {awayTeam.logo ? (
-              <Image
+              <img
                 src={awayTeam.logo}
                 alt={awayTeam.name}
-                fill
-                className="object-contain"
+                className="absolute inset-0 h-full w-full object-contain"
               />
             ) : (
               <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center text-sm font-bold">
