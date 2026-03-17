@@ -56,6 +56,8 @@ export function RefereeMatchView({ match: initialMatch }: RefereeMatchViewProps)
       teamName: g.team.name,
       teamId: g.team.id,
       isOwnGoal: g.isOwnGoal,
+      assistPlayerName: g.assistPlayer?.name ?? null,
+      assistPlayerNumber: g.assistPlayer?.number ?? null,
     })),
     ...currentMatch.cards.map((c) => ({
       id: c.id,

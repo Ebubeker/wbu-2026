@@ -41,6 +41,9 @@ export function RefereeTimeline({ events, onDelete, readOnly }: RefereeTimelineP
                 {event.isOwnGoal && <span className="ml-1 text-xs text-red-400">(OG)</span>}
               </p>
               <p className="text-xs text-muted-foreground">
+                {event.assistPlayerName && (
+                  <span className="text-primary/80">Assist: {event.assistPlayerName} · </span>
+                )}
                 {event.teamName} · {event.minute}&apos;
               </p>
             </div>

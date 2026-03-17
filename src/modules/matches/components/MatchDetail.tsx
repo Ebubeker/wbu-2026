@@ -28,6 +28,7 @@ type TimelineEvent = {
   playerName: string
   playerNumber: number
   isOwnGoal?: boolean
+  assistPlayerName?: string | null
   cardType?: 'YELLOW' | 'RED'
 }
 
@@ -94,6 +95,7 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
       playerName: goal.player.name,
       playerNumber: goal.player.number,
       isOwnGoal: goal.isOwnGoal,
+      assistPlayerName: goal.assistPlayer?.name ?? null,
     })),
     ...match.cards.map((card) => ({
       id: card.id,
@@ -344,6 +346,9 @@ export function MatchDetail({ match: initialMatch }: MatchDetailProps) {
                         </Link>
                         <p className="text-xs text-muted-foreground sm:text-sm">
                           #{event.playerNumber}
+                          {event.assistPlayerName && (
+                            <span className="ml-1 text-primary/70"> · Assist: {event.assistPlayerName}</span>
+                          )}
                         </p>
                       </div>
                     </div>

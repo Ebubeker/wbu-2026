@@ -24,5 +24,7 @@ export interface LiveEvent {
   teamName: string
   teamId: string
   isOwnGoal?: boolean
+  assistPlayerName?: string | null
+  assistPlayerNumber?: number | null
   cardType?: 'YELLOW' | 'RED'
 }

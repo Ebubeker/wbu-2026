@@ -24,6 +24,7 @@ export interface MatchWithEvents extends MatchData {
     minute: number
     isOwnGoal: boolean
     player: { id: string; name: string; number: number }
+    assistPlayer?: { id: string; name: string; number: number } | null
     team: { id: string; name: string }
   }>
   cards: Array<{

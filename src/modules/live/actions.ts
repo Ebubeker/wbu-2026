@@ -214,6 +214,7 @@ export async function addGoal(data: {
   matchId: string
   teamId: string
   playerId: string
+  assistPlayerId?: string | null
   minute?: number
   isOwnGoal: boolean
 }) {
@@ -237,11 +238,13 @@ export async function addGoal(data: {
         matchId: parsed.matchId,
         teamId: parsed.teamId,
         playerId: parsed.playerId,
+        assistPlayerId: parsed.assistPlayerId ?? null,
         minute: parsed.minute,
         isOwnGoal: parsed.isOwnGoal,
       },
       include: {
         player: { select: { id: true, name: true, number: true } },
+        assistPlayer: { select: { id: true, name: true, number: true } },
         team: { select: { id: true, name: true } },
       },
     })

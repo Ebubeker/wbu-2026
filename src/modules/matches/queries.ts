@@ -70,6 +70,7 @@ export async function getMatchById(id: string): Promise<MatchWithEvents | null> 
       goals: {
         include: {
           player: { select: { id: true, name: true, number: true } },
+          assistPlayer: { select: { id: true, name: true, number: true } },
           team: { select: { id: true, name: true } },
         },
         orderBy: { minute: 'asc' },

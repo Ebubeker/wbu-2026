@@ -19,7 +19,7 @@ export async function GET(
         },
         group: true,
         goals: {
-          include: { player: true, team: true },
+          include: { player: true, assistPlayer: true, team: true },
           orderBy: { minute: 'asc' },
         },
         cards: {

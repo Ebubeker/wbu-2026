@@ -36,6 +36,7 @@ export const goalSchema = z.object({
   matchId: z.string().uuid(),
   teamId: z.string().uuid(),
   playerId: z.string().uuid(),
+  assistPlayerId: z.string().uuid().nullable().optional(),
   minute: z.coerce.number().int().min(0).max(150),
   isOwnGoal: z.boolean().default(false),
 })

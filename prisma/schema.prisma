@@ -112,6 +112,7 @@ model Player {
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   teamId    String
   goals         Goal[]
+  assists       Goal[]         @relation("AssistPlayer")
   cards         Card[]
   lineupEntries LineupPlayer[]
   motmVotes     MotmVote[]
@@ -172,10 +173,12 @@ model Goal {
   matchId   String
   team      Team     @relation(fields: [teamId], references: [id])
   teamId    String
-  player    Player   @relation(fields: [playerId], references: [id])
-  playerId  String
-  minute    Int
-  isOwnGoal Boolean  @default(false)
+  player         Player   @relation(fields: [playerId], references: [id])
+  playerId       String
+  assistPlayer   Player?  @relation("AssistPlayer", fields: [assistPlayerId], references: [id])
+  assistPlayerId String?
+  minute         Int
+  isOwnGoal      Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@index([matchId])
