@@ -116,15 +116,19 @@ export function CardSteps({
   }
 
   const teamForPlayers = selectedTeamId === homeTeam.id ? homeTeam : awayTeam
-  const players = lineupPlayers[selectedTeamId!]?.length > 0
-    ? lineupPlayers[selectedTeamId!]
-    : teamForPlayers.players
+  const lineupIds = new Set(lineupPlayers[selectedTeamId!]?.map((p) => p.id) ?? [])
+  const players = [...teamForPlayers.players].sort((a, b) => {
+    const aInLineup = lineupIds.has(a.id) ? 0 : 1
+    const bInLineup = lineupIds.has(b.id) ? 0 : 1
+    return aInLineup - bInLineup || a.number - b.number
+  })
 
   return (
     <PlayerSelectView
       title="Which player?"
       stepLabel="Card — Step 3 of 3"
       players={players}
+      lineupIds={lineupIds}
       onSelect={handlePlayerSelect}
       onBack={() => setStep('team')}
       loading={saving}

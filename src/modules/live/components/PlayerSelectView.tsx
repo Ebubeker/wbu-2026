@@ -13,6 +13,7 @@ interface PlayerSelectViewProps {
   title: string
   stepLabel: string
   players: PlayerInfo[]
+  lineupIds?: Set<string>
   onSelect: (playerId: string) => void
   onBack: () => void
   loading?: boolean
@@ -22,6 +23,7 @@ export function PlayerSelectView({
   title,
   stepLabel,
   players,
+  lineupIds,
   onSelect,
   onBack,
   loading,
@@ -40,24 +42,27 @@ export function PlayerSelectView({
 
       <div className="flex-1 overflow-y-auto p-4">
         <div className="grid grid-cols-2 gap-3">
-          {players.map((player) => (
-            <button
-              key={player.id}
-              onClick={() => onSelect(player.id)}
-              disabled={loading}
-              className="flex items-center gap-3 rounded-xl border-2 border-border bg-card p-4 text-left transition-colors hover:border-primary active:bg-accent disabled:opacity-50"
-            >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-lg font-bold text-primary">
-                {player.number}
-              </div>
-              <div className="min-w-0">
-                <p className="truncate font-semibold">{player.name}</p>
-                {player.position && (
-                  <p className="text-xs text-muted-foreground">{player.position}</p>
-                )}
-              </div>
-            </button>
-          ))}
+          {players.map((player) => {
+            const inLineup = lineupIds ? lineupIds.has(player.id) : true
+            return (
+              <button
+                key={player.id}
+                onClick={() => onSelect(player.id)}
+                disabled={loading}
+                className={`flex items-center gap-3 rounded-xl border-2 bg-card p-4 text-left transition-colors hover:border-primary active:bg-accent disabled:opacity-50 ${inLineup ? 'border-border' : 'border-border/40 opacity-60'}`}
+              >
+                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg text-lg font-bold ${inLineup ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                  {player.number}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate font-semibold">{player.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {player.position}{!inLineup ? ' · Sub' : ''}
+                  </p>
+                </div>
+              </button>
+            )
+          })}
         </div>
 
         {players.length === 0 && (

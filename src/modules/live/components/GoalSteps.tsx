@@ -85,15 +85,19 @@ export function GoalSteps({
     : selectedTeamId!
 
   const teamForPlayers = playerTeamId === homeTeam.id ? homeTeam : awayTeam
-  const players = lineupPlayers[playerTeamId]?.length > 0
-    ? lineupPlayers[playerTeamId]
-    : teamForPlayers.players
+  const lineupIds = new Set(lineupPlayers[playerTeamId]?.map((p) => p.id) ?? [])
+  const players = [...teamForPlayers.players].sort((a, b) => {
+    const aInLineup = lineupIds.has(a.id) ? 0 : 1
+    const bInLineup = lineupIds.has(b.id) ? 0 : 1
+    return aInLineup - bInLineup || a.number - b.number
+  })
 
   return (
     <PlayerSelectView
       title="Which player?"
       stepLabel="Goal — Step 2 of 2"
       players={players}
+      lineupIds={lineupIds}
       onSelect={handlePlayerSelect}
       onBack={() => setStep('team')}
       loading={saving}
